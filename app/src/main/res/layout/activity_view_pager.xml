@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--The following code is the property and sole work of Mike Palarz, a student at Udacity-->
+
+<!--A ViewPager to be used for the movie details activity. This View allows the user to swipe
+left/right within the movie details screen.-->
+<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewpager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>

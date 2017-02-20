@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="loading_error_message">Movie data cannot be obtained. Please check your network
+        connection.</string>
+    <string name="movie_overview_header">Overview</string>
+    <string name="main_menu_sort_by_options">Sort movies by:</string>
+    <string name="main_menu_refresh_button">Refresh</string>
+    <string name="popup_menu_popularity_button">Popularity</string>
+    <string name="popup_menu_top_rated_button">Top Rated</string>
+
+</resources>

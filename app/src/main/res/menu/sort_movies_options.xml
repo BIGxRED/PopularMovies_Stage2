@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--The following code is the property and sole work of Mike Palarz, a student at Udacity-->
+
+<!--PopUp menu that is used for the sorting options. It was decided to use a PopUp menu to add a
+bit of polish to the app (instead of simply adding groups to main_menu.xml).-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popup_menu">
+
+    <!--Sort by popularity button-->
+    <item
+        android:id="@+id/sort_by_popular"
+        android:title="@string/popup_menu_popularity_button"/>
+
+    <!--Sort by top rated button-->
+    <item
+        android:id="@+id/sort_by_top_rated"
+        android:title="@string/popup_menu_top_rated_button"/>
+
+</menu>

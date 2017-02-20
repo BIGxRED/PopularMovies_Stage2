@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--The following code is the property and sole work of Mike Palarz, a student at Udacity-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!--Movie poster-->
+    <ImageView
+        android:id="@+id/iv_movie_poster"
+        android:layout_width="160dp"
+        android:layout_height="240dp"
+        android:layout_alignParentLeft="true"
+        style="@style/MoviePoster"/>
+
+    <!--Movie title-->
+    <TextView
+        android:id="@+id/tv_movie_title"
+        android:layout_height="wrap_content"
+        android:layout_width="200dp"
+        android:gravity="right"
+        android:layout_marginRight="8dp"
+        android:layout_alignParentRight="true"
+        android:text="N/A"
+        style="@style/MovieHeader"/>
+
+    <!--Movie release date-->
+    <TextView
+        android:id="@+id/tv_movie_release_date"
+        android:text="N/A"
+        android:layout_below="@id/tv_movie_title"
+        style="@style/MovieStats"/>
+
+    <!--Vote average and vote counts-->
+    <TextView
+        android:id="@+id/tv_movie_vote_results"
+        android:text="N/A"
+        android:layout_below="@id/tv_movie_release_date"
+        style="@style/MovieStats"/>
+
+    <!--Horizontal separator-->
+    <View
+        android:id="@+id/separator"
+        android:layout_below="@id/iv_movie_poster"
+        style="@style/HorizontalDivider"/>
+
+    <!--Overview heading-->
+    <TextView
+        android:id="@+id/tv_overview_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/movie_overview_header"
+        style="@style/MovieHeader"
+        android:layout_below="@id/separator"/>
+
+    <!--The movie overview is placed within a ScrollView in case the text becomes so long that it
+    cannot fit on the screen-->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_overview_heading">
+
+        <!--Movie overview-->
+        <TextView
+            android:id="@+id/tv_movie_overview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="N/A"/>
+
+    </ScrollView>
+
+</RelativeLayout>

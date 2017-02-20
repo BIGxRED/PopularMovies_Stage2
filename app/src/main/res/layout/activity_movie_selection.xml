@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--The following code is the property and sole work of Mike Palarz, a student at Udacity-->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--Progress bar to show that the movie data is currently being loaded. This is set to be
+    initially invisible.-->
+    <ProgressBar
+        android:id="@+id/pb_loading_data"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
+    <!--An error message to be shown in case the movie data could not be obtained (such as if the
+    user has lost their connection to the Internet). This is set to be initially invisible.-->
+    <TextView
+        android:id="@+id/tv_error_loading_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/loading_error_message"
+        android:textSize="22sp"
+        android:visibility="invisible"
+        android:layout_gravity="center"
+        android:textAlignment="center"/>
+
+    <!--A RecyclerView which is used to show the user all of the movie posters which they may
+    choose from.-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_movie_selection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+</FrameLayout>
