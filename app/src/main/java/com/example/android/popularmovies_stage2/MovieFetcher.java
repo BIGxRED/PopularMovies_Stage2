@@ -40,7 +40,7 @@ public class MovieFetcher {
     private static final String PARAM_PAGE = "page";
 
     //Parameter values to be used when building the URL
-    private static final String API_KEY = "";
+    private static final String API_KEY = "ef482ced903a55abbe59f0acb7f4899c";
     private static final String LANGUAGE = "en-US";
 
     //This method is used in order to build the URL that will be used to query the TheMovieDB. The
