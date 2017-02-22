@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="list_preference_sorting_options_entries">
+        <item>@string/list_preference_sorting_options_entry_popularity</item>
+        <item>@string/list_preference_sorting_options_entry_top_rated</item>
+    </array>
+
+    <array name="list_preference_sorting_options_entry_values">
+        <item>@string/list_preference_sorting_options_entry_value_popularity</item>
+        <item>@string/list_preference_sorting_options_entry_value_top_rated</item>
+    </array>
+
+</resources>

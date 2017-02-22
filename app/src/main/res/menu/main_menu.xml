@@ -11,9 +11,17 @@ movie data-->
     <item
         android:id="@+id/sort_options"
         android:title="@string/main_menu_sort_by_options"
-        android:orderInCategory="1"
         app:showAsAction="always">
     </item>
+
+    <!--Use the following when you're finished using the pop-up menu-->
+    <!--android:visible="false"-->
+
+    <item
+        android:id="@+id/settings"
+        android:title="@string/main_menu_settings_button"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
 
     <!--Refresh button which will resend a query through The MovieDB API to obtain the data once
     again-->
@@ -21,6 +29,6 @@ movie data-->
         android:id="@+id/refresh"
         android:title="@string/main_menu_refresh_button"
         android:orderInCategory="2"
-        app:showAsAction="always"/>
+        app:showAsAction="never"/>
 
 </menu>

@@ -5,6 +5,7 @@ The following code is the property and sole work of Mike Palarz, a student at Ud
 package com.example.android.popularmovies_stage2;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -12,6 +13,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.ListPreference;
+import android.support.v7.preference.PreferenceManager;
+import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -38,7 +42,8 @@ when the user scrolls to the bottom of the current collection of movies, another
 initiated and additional movies are appended to the current view.
  */
 
-public class MovieSelection extends AppCompatActivity implements LoaderCallbacks<List<Movie>> {
+public class MovieSelection extends AppCompatActivity implements LoaderCallbacks<List<Movie>>,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String TAG = "MovieSelection";  //Tag used for debugging
 
@@ -80,8 +85,16 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         mRecyclerView.setHasFixedSize(true);
 
-        mPageNumber = 1;    //First page always has a value of 1
-        mMethodFlag = 0;    //On startup, the movies are sorted by popularity
+//        mPageNumber = 1;    //First page always has a value of 1
+
+        /*
+        This is deprecated due to implementing SharedPreferences. mMethodFlag is now stored within
+        the SharedPreferences database and must be obtained from their accordingly. The value of
+        mMethodFlag is obtained via the setupSharedPreferences() method.
+        */
+
+//        mMethodFlag = 0;    //On startup, the movies are sorted by popularity
+        setupSharedPreferences();
 
         //Create and set the adapter accordingly
         mAdapter = new MovieAdapter(mMoviesList);
@@ -101,11 +114,29 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
                     //possible
                     if(!mRecyclerView.canScrollVertically(1)){
                         //A new ASyncTask is launched to poll for additional movies
+
+                        /*It is crucial to use restartLoader() in this case. This forces the data to
+                        be reset by calling onCreateLoader() once again, which then causes
+                        loadInBackground() to also be called. If initLoader() were to be used in this
+                        case (and in any other situation where we want the next page of movie data
+                        to be obtained), the next page of data would never be loaded b/c the loader
+                        has already been created within onCreate() via initLoader(). If the loader
+                        already exists and initLoader() is used instead of restartLoader(), then
+                        onCreateLoader() is never used, only onLoadFinished().
+                        */
+
                         getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID,null,MovieSelection.this);
                     }
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 
     //MovieAdapter class, which is an extension of the RecyclerView.Adapter class. This class keeps
@@ -182,8 +213,13 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
     }
 
-    //This is a helper method which assists in showing the pop-up menu associated to one of the
-    //menu items within the main menu
+    /*
+    This was a method that was initially used in stage 1 of this project. It is now deprecated for
+    stage 2, largely because SharedPreferences were implemented. The general purpsoe of this method
+    is to generate a popup menu when the user clicked on a button titled "Sort By". When the user
+    clicked on this button, they would be able to choose the different sorting options. However,
+    the sorting options are now stored in SharedPreferences.
+     */
     private void showPopUp(){
         //The pop-up menu must be anchored to a View object. For this case, the pop-up will be
         //anchored to the "Sort movies by:" menu button
@@ -232,10 +268,16 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     @Override
     public boolean onOptionsItemSelected(final MenuItem item){
         switch(item.getItemId()){
-            //Launches the pop-up menu created within showPopUp()
             case R.id.sort_options:
+                //showPopUp() has been deprecated for stage 2 of this project
                 showPopUp();
                 return true;
+
+            case R.id.settings:
+                Intent launchSettingsActivity = new Intent(this, SettingsActivity.class);
+                startActivity(launchSettingsActivity);
+                return true;
+
             //Simply fetches the movie data again, starting from the first page
             case R.id.refresh:
                 mPageNumber = 1;
@@ -247,6 +289,14 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         }
     }
 
+    /*
+    This method is called whenever a new Loader is to be instantiated by the LoaderManager. In
+    our case, we are creating an ASyncTaskLoader, which is a subclass of Loader. The Loader class
+    itself is abstract, so a subclass of it must be created.
+
+    This method is called the first time a Loader is created via initLoader(). It is always when
+    restartLoader() is used, regardless if the Loader already exists or not.
+     */
     @Override
     public Loader<List<Movie>> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<List<Movie>>(this) {
@@ -256,7 +306,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
             /*
             This method is equivalent to onPreExecute() of a ASyncTask. Any preparations prior to
             the background thread running should be done here. We've also implemented caching via
-            loaderMovies, which is also implemented in this case.
+            loaderMovies.
              */
             @Override
             protected void onStartLoading() {
@@ -269,11 +319,24 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
                 }
             }
 
+            /*
+            This method is similar to doInBackground() of a simple ASyncTask. It is where the bulk
+            of the work is done, where a background thread is created in order to fetch more movie
+            data for us.
+             */
             @Override
             public List<Movie> loadInBackground() {
+//                Log.i(TAG, "Value of mPageNumber within loadInBackground(): " + mPageNumber);
                 return new MovieFetcher().fetchMovies(mMethodFlag, mPageNumber);
             }
 
+            /*
+            This method is similar to onPostExecute() of a regular ASyncTask such that it is called
+            when there is new data to be sent to the client (the client is whatever entity implements
+            the LoaderCallbacks interface, which is the MovieSelection class in this case). The call
+            to super() actually handles delivering the data, but additional logic has been added
+            to this method.
+             */
             @Override
             public void deliverResult(List<Movie> data) {
                 loaderMovies = data;
@@ -282,6 +345,9 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         };
     }
 
+    /*
+    Called whenever a previously created Loader has finished its load.
+     */
     @Override
     public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
         mProgressBar.setVisibility(View.INVISIBLE); //ProgressBar is hidden
@@ -295,6 +361,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
             // obtained
             mPageNumber++;  //Increment mPageNumber so that the next page is obtained the next
             // time a FetchMoviesTask is launched
+
+//            Log.i(TAG, "Value of mPageNumber within onLoadFinished(): " + mPageNumber);
         }
 
         //Otherwise, hide the RecyclerView and show the error message
@@ -304,6 +372,12 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         }
     }
 
+    /*
+    This method is called whenever a Loader is being reset, which inherently makes it data unavailable.
+    Due to the data being unavailable, any references to that data should be removed. In the of this
+    application, we don't have a need for this method but it must be implemented in order to
+    use the LoaderCallbacks interface.
+     */
     @Override
     public void onLoaderReset(Loader<List<Movie>> loader) {
         //Nothing to do in our case
@@ -312,8 +386,73 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        //TODO: Sort of concerned about using the same constants for this Bundle as what's being
+        //used to launch the MovieDetails activity. Keep an eye on this.
         outState.putParcelableArrayList(EXTRA_PARCEL, mMoviesList);
         outState.putInt(EXTRA_METHOD_FLAG, mMethodFlag);
         outState.putInt(EXTRA_PAGE_NUMBER, mPageNumber);
+    }
+
+    /*
+    This is a helper method which pulls all of the values from SharedPreferences that correspond to
+    a view within the UI and adjusts those views accordingly. As of now, the only setting is for
+    the sorting options, but this method would be expanded as more settings are included.
+     */
+    private void setupSharedPreferences(){
+        //Get a reference to the SharedPreferences DB
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        //TODO: See if there's a cleaner way of doing this. Maybe get a reference to an individual
+        //preference (in this case, the sorting options preference) and then use findIndexOfValue().
+        //Also consider this: https://developer.android.com/training/basics/network-ops/xml.html
+
+        //Obtain the current value of the sorting options setting, which is stored as a String.
+        String preferenceMethodFlagString = preferences.getString(getString(R.string.list_preference_sorting_options_key),
+               getString(R.string.list_preference_sorting_options_default_value));
+
+        //However, the value of the sorting options ListPreference corresponds to mMethodFlag, so
+        //it must be parsed into an int
+        int preferenceMethodFlag = Integer.parseInt(preferenceMethodFlagString);
+        mMethodFlag = preferenceMethodFlag;
+
+        //We also want to reset the page number so that the data is being pulled from the beginning
+        //of the data that is pulled from TheMovieDB API
+        mPageNumber = 1;
+
+        //Finally, we register this class as our OnSharedPreferenceChangeListener
+        preferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    /*
+    This method listens to any changes that may have occurred within the Settings screen (and the
+    SharedPreferences database as well) and makes adjustments to the UI that correspond to those
+    changes. Currently, the only setting that can be adjusted is the sorting options, but this
+    would be expanded as more settings would be added.
+     */
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        //First we check if key matches the key of sorting options
+        if (key.equals(getString(R.string.list_preference_sorting_options_key))){
+
+            //Then we obtain the value of the ListPreference and parse it into an int
+            String methodFlagString = sharedPreferences
+                    .getString(key, getString(R.string.list_preference_sorting_options_default_value));
+            mMethodFlag = Integer.parseInt(methodFlagString);
+
+            //mPageNumber is also reset so that the beginning of the movie data is being pulled
+            //from the API
+            mPageNumber = 1;
+
+            //We also want to clear out the old data. There's no need to hold onto it (and hence,
+            //display it) if the user has changed their sorting setting
+            mMoviesList.clear();
+
+            //Finally, we relaunch the ASyncTaskLoader
+            getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID,null,this);
+        }
+
+        //TODO: Maybe one additional setting would be to allow the user to clear out all of their
+        //current favorited movies? Just a thought.
     }
 }

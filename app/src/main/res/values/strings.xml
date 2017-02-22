@@ -1,11 +1,34 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+
+    <!--Labels for our child activities. Not all of these have been used, but they've been defined-->
+    <!--for completeness-->
+    <string name="activity_label_details">Details</string>
+    <string name="activity_label_settings">Settings</string>
+
+    <!--Strings for the MovieSelection activity-->
     <string name="loading_error_message">Movie data cannot be obtained. Please check your network
         connection.</string>
+
+    <!--Strings for the MovieDetails activity-->
     <string name="movie_overview_header">Overview</string>
+
+    <!--Strings used for the action bar menu-->
     <string name="main_menu_sort_by_options">Sort movies by:</string>
     <string name="main_menu_refresh_button">Refresh</string>
+    <string name="main_menu_settings_button">Settings</string>
     <string name="popup_menu_popularity_button">Popularity</string>
     <string name="popup_menu_top_rated_button">Top Rated</string>
+
+    <!--SHARED PREFERENCES STRINGS-->
+
+    <!--Strings used for the ListPreference that allows the user to select their sorting option-->
+    <string name="list_preference_sorting_options_default_value">0</string>
+    <string name="list_preference_sorting_options_title">Movies sorted by:</string>
+    <string name="list_preference_sorting_options_key">spkey_sorting_options</string>
+    <string name="list_preference_sorting_options_entry_popularity">Popularity</string>
+    <string name="list_preference_sorting_options_entry_top_rated">Top Rated</string>
+    <string name="list_preference_sorting_options_entry_value_popularity">0</string>
+    <string name="list_preference_sorting_options_entry_value_top_rated">1</string>
 
 </resources>
