@@ -6,6 +6,7 @@ package com.example.android.popularmovies_stage2;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -60,6 +61,9 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     RecyclerView mRecyclerView; //Reference to the RecyclerView
     MovieAdapter mAdapter;  //MovieAdapter that will be set to mRecyclerView
     ArrayList<Movie> mMoviesList = new ArrayList<>();   //ArrayList which will store all of the Movies
+
+    private SQLiteDatabase mDatabase;
+
     ProgressBar mProgressBar;   //ProgressBar which is used to show that data is being loaded
     TextView mErrorMessageTextView; //TextView which is shown in case data could not be retrieved
     int mPageNumber;    //Used to move onto the next page once the user scrolls to the bottom of
@@ -139,8 +143,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
 
-    //MovieAdapter class, which is an extension of the RecyclerView.Adapter class. This class keeps
-    //track of all the views which will be displayed in the RecyclerView.
+//    //MovieAdapter class, which is an extension of the RecyclerView.Adapter class. This class keeps
+//    //track of all the views which will be displayed in the RecyclerView.
     private class MovieAdapter extends RecyclerView.Adapter<MovieHolder>{
         private ArrayList<Movie> adapterMovies;
 
@@ -209,8 +213,6 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
             movieDetailsIntent.putExtra(EXTRA_ID, clickedMovie.getID());
             startActivity(movieDetailsIntent);
         }
-
-
     }
 
     /*
