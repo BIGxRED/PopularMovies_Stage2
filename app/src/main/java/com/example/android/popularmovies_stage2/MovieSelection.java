@@ -6,6 +6,7 @@ package com.example.android.popularmovies_stage2;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.android.popularmovies_stage2.data.MovieContract;
+import com.example.android.popularmovies_stage2.data.MovieDBHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -89,19 +92,22 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         mRecyclerView.setHasFixedSize(true);
 
-//        mPageNumber = 1;    //First page always has a value of 1
-
         /*
         This is deprecated due to implementing SharedPreferences. mMethodFlag is now stored within
         the SharedPreferences database and must be obtained from their accordingly. The value of
         mMethodFlag is obtained via the setupSharedPreferences() method.
         */
 
-//        mMethodFlag = 0;    //On startup, the movies are sorted by popularity
         setupSharedPreferences();
 
+        //Initializing the SQLite database
+        MovieDBHelper dbHelper = new MovieDBHelper(this);
+        mDatabase = dbHelper.getWritableDatabase();
+
+
         //Create and set the adapter accordingly
-        mAdapter = new MovieAdapter(this, mMoviesList);
+        //TODO: Make sure to adjust the third parameter at some point
+        mAdapter = new MovieAdapter(this, mMoviesList, 0);
         mRecyclerView.setAdapter(mAdapter);
 
         //Lastly, movie data is obtained through the FetchMoviesTask class
@@ -384,5 +390,15 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         //TODO: Maybe one additional setting would be to allow the user to clear out all of their
         //current favorited movies? Just a thought.
+    }
+
+    private Cursor getAllMovies(){
+        return mDatabase.query(MovieContract.MovieTable.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                MovieContract.MovieTable._ID);
     }
 }

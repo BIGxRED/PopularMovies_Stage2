@@ -18,11 +18,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
 
     private ArrayList<Movie> adapterMovies;
     private Context adapterContext;
+    private int adapterMovieCount;
 
     //Default constructor of the adapter
-    public MovieAdapter(Context context, ArrayList<Movie> movies){
+    public MovieAdapter(Context context, ArrayList<Movie> movies, int count){
         adapterContext = context;
         adapterMovies = movies;
+        adapterMovieCount = count;
     }
 
     //This method simply inflates the layout for each movie poster
@@ -49,6 +51,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
     //Simply returns the number of movies contained within adapterMovies
     @Override
     public int getItemCount(){
+        //TODO: Make sure to adjust this so that it returns adapaterMovieCount later on
         return adapterMovies.size();
     }
 
