@@ -143,6 +143,13 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     }
 
     @Override
+    protected void onResume() {
+        //TODO: Make sure to perform something equivalent to restartLoader() here when implementing
+        //the CursorLoader
+        super.onResume();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         PreferenceManager.getDefaultSharedPreferences(this)
