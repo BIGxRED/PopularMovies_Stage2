@@ -4,8 +4,11 @@ The following code is the property and sole work of Mike Palarz, a student at Ud
 
 package com.example.android.popularmovies_stage2;
 
+import android.content.ContentValues;
 import android.net.Uri;
 import android.util.Log;
+
+import com.example.android.popularmovies_stage2.data.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -108,16 +111,19 @@ public class MovieFetcher {
     //This method parses through JSON data, which is expected to be provided by a String generated
     //by getHTTPResponse(). The String is parsed through, Movie objects are iteratively created and
     //appended to an ArrayList.
-    private void parseMovies(String httpResponse, List moviesList) throws JSONException{
+    private static ContentValues[] parseMovies(String httpResponse) throws JSONException{
         JSONObject jsonRoot = new JSONObject(httpResponse);
         //All of the movies are contained within an array. The array in this case may be referred to
         //as "results"
         JSONArray jsonResults = jsonRoot.getJSONArray("results");
 
+        ContentValues[] movies = new ContentValues[jsonResults.length()];
+
         //The array is then iterated through and a Movie object is created for each entry within
         //jsonResults. The Movie is then appended to moviesList.
         for (int i = 0; i < jsonResults.length(); i++){
             JSONObject jsonMovie = jsonResults.getJSONObject(i);
+
             String title = jsonMovie.getString("title");
             int ID = jsonMovie.getInt("id");
             String posterPath = jsonMovie.getString("poster_path");
@@ -132,27 +138,43 @@ public class MovieFetcher {
 
             String backdropPath = jsonMovie.getString("backdrop_path");
 
+            ContentValues movieCV = new ContentValues();
+            movieCV.put(MovieContract.MovieTable.COLUMN_TITLE, title);
+            movieCV.put(MovieContract.MovieTable.COLUMN_MOVIE_ID, ID);
+            movieCV.put(MovieContract.MovieTable.COLUMN_POSTER_PATH, posterPath);
+            movieCV.put(MovieContract.MovieTable.COLUMN_OVERVIEW, overview);
+            movieCV.put(MovieContract.MovieTable.COLUMN_RELEASE_DATE, releaseDate);
+            movieCV.put(MovieContract.MovieTable.COLUMN_VOTE_COUNT, voteCount);
+            movieCV.put(MovieContract.MovieTable.COLUMN_VOTE_AVERAGE, voteAverage);
+            movieCV.put(MovieContract.MovieTable.COLUMN_BACKDROP_PATH, backdropPath);
+
+            movies[i] = movieCV;
+
             Movie movie = new Movie(title, ID, posterPath, overview, releaseDate, voteCount,
                     voteAverage, backdropPath);
+
+            //These log messages are kept for possible debugging purposes
             Log.i(TAG, "\nThe current movie has been added to the array: \n");
             Log.i(TAG, movie.toString());
-            moviesList.add(movie);
 
         }
+        return movies;
     }
 
     //A helper method, which essentially combines buildURL(), getHTTPResponse(), and parseMovies()
     //all within one method.
-    public List<Movie> fetchMovies(int methodFlag, int pageNumber){
-        List<Movie> movies = new ArrayList<>();
+    public static ContentValues[] fetchMovies(int methodFlag, int pageNumber){
+        ContentValues[] movies;
         try {
             String httpResponse = getHTTPResponse(buildURL(methodFlag, pageNumber));
-            parseMovies(httpResponse, movies);
+            movies = parseMovies(httpResponse);
         }
         catch(IOException ioe){
+            movies = null;
             ioe.printStackTrace();
         }
         catch(JSONException je){
+            movies = null;
             je.printStackTrace();
         }
         return movies;

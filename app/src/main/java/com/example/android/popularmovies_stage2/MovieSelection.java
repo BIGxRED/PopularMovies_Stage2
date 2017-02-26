@@ -8,35 +8,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.example.android.popularmovies_stage2.data.MovieDBHelper;
-import com.squareup.picasso.Picasso;
+import com.example.android.popularmovies_stage2.sync.MovieIntentService;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /*
 The purpose of this class is to allow the user to select a movie from a grid array of movie posters.
@@ -46,7 +37,7 @@ when the user scrolls to the bottom of the current collection of movies, another
 initiated and additional movies are appended to the current view.
  */
 
-public class MovieSelection extends AppCompatActivity implements LoaderCallbacks<List<Movie>>,
+public class MovieSelection extends AppCompatActivity implements LoaderCallbacks<Cursor>,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String TAG = "MovieSelection";  //Tag used for debugging
@@ -73,6 +64,30 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
                         // the RecyclerView
     int mMethodFlag;    //Used to choose the correct method for sorting the movies through the
                         // PopUp menu
+
+
+    //TODO: For this activity, it doesn't make much sense to include ALL of the movie attributes
+    //since all we really care about is the movie poster. Adjust this later on once you have the
+    //posters displaying again
+    public static final String[] MOVIE_DEFAULT_PROJECTION = {
+        MovieContract.MovieTable.COLUMN_TITLE,
+        MovieContract.MovieTable.COLUMN_MOVIE_ID,
+        MovieContract.MovieTable.COLUMN_OVERVIEW,
+        MovieContract.MovieTable.COLUMN_RELEASE_DATE,
+        MovieContract.MovieTable.COLUMN_VOTE_COUNT,
+        MovieContract.MovieTable.COLUMN_VOTE_AVERAGE,
+        MovieContract.MovieTable.COLUMN_POSTER_PATH,
+        MovieContract.MovieTable.COLUMN_BACKDROP_PATH
+    };
+
+    public static final int INDEX_TITLE = 0;
+    public static final int INDEX_MOVIE_ID = 1;
+    public static final int INDEX_OVERVIEW = 2;
+    public static final int INDEX_RELEASE_DATE = 3;
+    public static final int INDEX_VOTE_COUNT = 4;
+    public static final int INDEX_VOTE_AVERAGE = 5;
+    public static final int INDEX_POSTER_PATH = 6;
+    public static final int INDEX_BACKDROP_PATH = 7;
 
 
     @Override
@@ -106,12 +121,17 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
 
         //Create and set the adapter accordingly
-        //TODO: Make sure to adjust the third parameter at some point
-        mAdapter = new MovieAdapter(this, mMoviesList, 0);
+        mAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
         //Lastly, movie data is obtained through the FetchMoviesTask class
         getSupportLoaderManager().initLoader(MOVIE_LOADER_ID,null,this);
+
+        Intent syncMoviesIntent = new Intent(this, MovieIntentService.class);
+        syncMoviesIntent.putExtra(EXTRA_METHOD_FLAG, mMethodFlag);
+        syncMoviesIntent.putExtra(EXTRA_PAGE_NUMBER, mPageNumber);
+        startService(syncMoviesIntent);
+        mAdapter.notifyDataSetChanged();
 
         //Add an OnScrollListener in order to implement pagination
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
@@ -241,78 +261,28 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     restartLoader() is used, regardless if the Loader already exists or not.
      */
     @Override
-    public Loader<List<Movie>> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<List<Movie>>(this) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id){
+            case MOVIE_LOADER_ID:
 
-            List<Movie> loaderMovies = null;
+                return new CursorLoader(this,
+                        MovieContract.MovieTable.CONTENT_URI,
+                        MOVIE_DEFAULT_PROJECTION,
+                        null,
+                        null,
+                        MovieContract.MovieTable._ID);
 
-            /*
-            This method is equivalent to onPreExecute() of a ASyncTask. Any preparations prior to
-            the background thread running should be done here. We've also implemented caching via
-            loaderMovies.
-             */
-            @Override
-            protected void onStartLoading() {
-                if (loaderMovies != null){
-                    deliverResult(loaderMovies);
-                }
-                else{
-                    mProgressBar.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
-            }
-
-            /*
-            This method is similar to doInBackground() of a simple ASyncTask. It is where the bulk
-            of the work is done, where a background thread is created in order to fetch more movie
-            data for us.
-             */
-            @Override
-            public List<Movie> loadInBackground() {
-//                Log.i(TAG, "Value of mPageNumber within loadInBackground(): " + mPageNumber);
-                return new MovieFetcher().fetchMovies(mMethodFlag, mPageNumber);
-            }
-
-            /*
-            This method is similar to onPostExecute() of a regular ASyncTask such that it is called
-            when there is new data to be sent to the client (the client is whatever entity implements
-            the LoaderCallbacks interface, which is the MovieSelection class in this case). The call
-            to super() actually handles delivering the data, but additional logic has been added
-            to this method.
-             */
-            @Override
-            public void deliverResult(List<Movie> data) {
-                loaderMovies = data;
-                super.deliverResult(data);
-            }
-        };
+            default:
+                throw new RuntimeException("This type of loader with ID" + id + " was not implemented.");
+        }
     }
 
     /*
     Called whenever a previously created Loader has finished its load.
      */
     @Override
-    public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
-        mProgressBar.setVisibility(View.INVISIBLE); //ProgressBar is hidden
-
-        //If the ArrayList returned by doInBackground() actually contains data...
-        if(data.size() != 0){
-            mRecyclerView.setVisibility(View.VISIBLE);  //Ensure that the RecycerView is visible
-            mErrorMessageTextView.setVisibility(View.INVISIBLE);    //Hide the error message
-            mMoviesList.addAll(data);   //Add all of the movies to mMoviesList
-            mAdapter.notifyDataSetChanged();    //Let the adapter know that new data has been
-            // obtained
-            mPageNumber++;  //Increment mPageNumber so that the next page is obtained the next
-            // time a FetchMoviesTask is launched
-
-//            Log.i(TAG, "Value of mPageNumber within onLoadFinished(): " + mPageNumber);
-        }
-
-        //Otherwise, hide the RecyclerView and show the error message
-        else{
-            mRecyclerView.setVisibility(View.INVISIBLE);
-            mErrorMessageTextView.setVisibility(View.VISIBLE);
-        }
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
     }
 
     /*
@@ -322,8 +292,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     use the LoaderCallbacks interface.
      */
     @Override
-    public void onLoaderReset(Loader<List<Movie>> loader) {
-        //Nothing to do in our case
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 
     @Override

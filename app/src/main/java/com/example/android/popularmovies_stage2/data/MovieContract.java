@@ -14,6 +14,7 @@ public class MovieContract {
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIES).build();
 
         public static final String TABLE_NAME = "movies";
+
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_MOVIE_ID = "movieID";
         public static final String COLUMN_OVERVIEW = "overview";

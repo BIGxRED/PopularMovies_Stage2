@@ -11,11 +11,9 @@ movie data-->
     <item
         android:id="@+id/sort_options"
         android:title="@string/main_menu_sort_by_options"
-        app:showAsAction="always">
+        app:showAsAction="always"
+        android:visible="false">
     </item>
-
-    <!--Use the following when you're finished using the pop-up menu-->
-    <!--android:visible="false"-->
 
     <item
         android:id="@+id/settings"
