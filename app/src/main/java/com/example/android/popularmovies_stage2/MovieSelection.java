@@ -17,6 +17,7 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.example.android.popularmovies_stage2.data.MovieDBHelper;
 import com.example.android.popularmovies_stage2.sync.MovieIntentService;
+import com.example.android.popularmovies_stage2.sync.MovieSyncUtils;
 
 import java.util.ArrayList;
 
@@ -60,9 +62,13 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
     ProgressBar mProgressBar;   //ProgressBar which is used to show that data is being loaded
     TextView mErrorMessageTextView; //TextView which is shown in case data could not be retrieved
-    int mPageNumber;    //Used to move onto the next page once the user scrolls to the bottom of
+
+    //TODO: Should this variable be a part of this class? It made sense previously. However, since
+    //you're now using services to load the movie data, it may be better to move this to another
+    //class that would be more suitable.
+    public int mPageNumber;    //Used to move onto the next page once the user scrolls to the bottom of
                         // the RecyclerView
-    int mMethodFlag;    //Used to choose the correct method for sorting the movies through the
+    public int mMethodFlag;    //Used to choose the correct method for sorting the movies through the
                         // PopUp menu
 
 
@@ -124,42 +130,46 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         mAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
-        //Lastly, movie data is obtained through the FetchMoviesTask class
-        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID,null,this);
+        //Add an OnScrollListener in order to implement pagination
+
+        //TODO: Add this later on
+//        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+//            @Override
+//            public void onScrolled(RecyclerView view, int dx, int dy){
+//                super.onScrolled(view, dx, dy);
+//                //First we check if the user has scrolled vertically at all
+//                if(dy > 0){
+//                    //Then we check if vertically scrolling in the down direction is no longer
+//                    //possible
+//                    if(!mRecyclerView.canScrollVertically(1)){
+//                        //A new ASyncTask is launched to poll for additional movies
+//
+//                        /*It is crucial to use restartLoader() in this case. This forces the data to
+//                        be reset by calling onCreateLoader() once again, which then causes
+//                        loadInBackground() to also be called. If initLoader() were to be used in this
+//                        case (and in any other situation where we want the next page of movie data
+//                        to be obtained), the next page of data would never be loaded b/c the loader
+//                        has already been created within onCreate() via initLoader(). If the loader
+//                        already exists and initLoader() is used instead of restartLoader(), then
+//                        onCreateLoader() is never used, only onLoadFinished().
+//                        */
+//
+//                        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID,null,MovieSelection.this);
+//                    }
+//                }
+//            }
+//        });
+
+
 
         Intent syncMoviesIntent = new Intent(this, MovieIntentService.class);
         syncMoviesIntent.putExtra(EXTRA_METHOD_FLAG, mMethodFlag);
-        syncMoviesIntent.putExtra(EXTRA_PAGE_NUMBER, mPageNumber);
-        startService(syncMoviesIntent);
-        mAdapter.notifyDataSetChanged();
+//        syncMoviesIntent.putExtra(EXTRA_PAGE_NUMBER, mPageNumber);
 
-        //Add an OnScrollListener in order to implement pagination
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
-            @Override
-            public void onScrolled(RecyclerView view, int dx, int dy){
-                super.onScrolled(view, dx, dy);
-                //First we check if the user has scrolled vertically at all
-                if(dy > 0){
-                    //Then we check if vertically scrolling in the down direction is no longer
-                    //possible
-                    if(!mRecyclerView.canScrollVertically(1)){
-                        //A new ASyncTask is launched to poll for additional movies
+        MovieSyncUtils.initialize(this, syncMoviesIntent);
 
-                        /*It is crucial to use restartLoader() in this case. This forces the data to
-                        be reset by calling onCreateLoader() once again, which then causes
-                        loadInBackground() to also be called. If initLoader() were to be used in this
-                        case (and in any other situation where we want the next page of movie data
-                        to be obtained), the next page of data would never be loaded b/c the loader
-                        has already been created within onCreate() via initLoader(). If the loader
-                        already exists and initLoader() is used instead of restartLoader(), then
-                        onCreateLoader() is never used, only onLoadFinished().
-                        */
-
-                        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID,null,MovieSelection.this);
-                    }
-                }
-            }
-        });
+        //Lastly, movie data is obtained through the FetchMoviesTask class
+        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID,null,this);
     }
 
     @Override
@@ -283,6 +293,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
+        mPageNumber++;
     }
 
     /*

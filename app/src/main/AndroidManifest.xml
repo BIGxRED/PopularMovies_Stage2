@@ -34,11 +34,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MovieSelection"/>
         </activity>
-    
-    <provider
-        android:authorities="com.example.android.popularmovies_stage2"
-        android:name=".data.MovieContentProvider"
-        android:exported="false"/>
+
+        <provider
+            android:authorities="com.example.android.popularmovies_stage2"
+            android:name=".data.MovieContentProvider"
+            android:exported="false"/>
+
+        <service android:name=".sync.MovieIntentService"
+                 android:exported="false"/>
 
     </application>
 

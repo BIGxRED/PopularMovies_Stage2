@@ -10,11 +10,14 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 public class MovieContentProvider extends ContentProvider {
 
     public static final int MOVIES = 100;
     public static final int MOVIE_WITH_ID = 101;
+
+    public static final String TAG = "MovieContentProvider";
 
     private MovieDBHelper mDBHelper;
 
@@ -116,6 +119,7 @@ public class MovieContentProvider extends ContentProvider {
                         long newID = database.insert(MovieContract.MovieTable.TABLE_NAME,null,value);
                         if (newID != -1){
                             insertedRowsCount++;
+                            Log.i(TAG, "Number of rows inserted: " + insertedRowsCount);
                         }
                     }
                     database.setTransactionSuccessful();

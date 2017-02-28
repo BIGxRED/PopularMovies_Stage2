@@ -43,8 +43,12 @@ public class MovieFetcher {
     private static final String PARAM_PAGE = "page";
 
     //Parameter values to be used when building the URL
-    private static final String API_KEY = "";
+    private static final String API_KEY = "ef482ced903a55abbe59f0acb7f4899c";
     private static final String LANGUAGE = "en-US";
+
+    //TODO: Get a better grasp on static methods and then look over your work here. Is it really
+    //necessary to declare all of these methods as static? And more importantly, is it a good
+    //practice to do so?
 
     //This method is used in order to build the URL that will be used to query the TheMovieDB. The
     //methodFlag parameter specifies which of the two API methods will be used (either polling
