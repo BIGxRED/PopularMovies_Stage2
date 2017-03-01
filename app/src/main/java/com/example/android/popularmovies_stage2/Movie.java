@@ -24,6 +24,9 @@ public class Movie implements Parcelable {
     float mVoteAverage; //float used to store the average vote value
     String mBackdropPath;   //String used to store the relative path of the movie backdrop image
 
+    public static final String SORTED_BY_POPULARITY = "popularity";
+    public static final String SORTED_BY_TOP_RATED = "top rated";
+
     //Default constructor of a Movie object
     public Movie(String title, int ID, String posterPath, String overview, String releaseDate,
                  int voteCount, float voteAverage, String backdropPath){

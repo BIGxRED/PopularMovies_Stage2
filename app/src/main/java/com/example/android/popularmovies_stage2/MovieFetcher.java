@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLDataException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -32,6 +33,8 @@ import java.util.Scanner;
 public class MovieFetcher {
     private static final String TAG = "MovieFetcher";
 
+    public static int mMethodFlag;
+
     //Constants used for building the base URL
     private static final String MOVIEDB_BASE_URL = "https://api.themoviedb.org/3/movie";
     private static final String METHOD_MOVIE_POPULAR = "popular";
@@ -43,21 +46,29 @@ public class MovieFetcher {
     private static final String PARAM_PAGE = "page";
 
     //Parameter values to be used when building the URL
-    private static final String API_KEY = "ef482ced903a55abbe59f0acb7f4899c";
+    private static final String API_KEY = "";
     private static final String LANGUAGE = "en-US";
 
     //TODO: Get a better grasp on static methods and then look over your work here. Is it really
     //necessary to declare all of these methods as static? And more importantly, is it a good
     //practice to do so?
 
+    public static int getMethodFlag(){
+        return mMethodFlag;
+    }
+
+    public static void setMethodFlag(int newMethodFlag){
+        mMethodFlag = newMethodFlag;
+    }
+
     //This method is used in order to build the URL that will be used to query the TheMovieDB. The
     //methodFlag parameter specifies which of the two API methods will be used (either polling
     //movies by popularity or top rated). The pageNumber parameter specifies which page of data
     //should be obtained. The page number is used within MovieSelection in order to allow for
     //pagination/infinite scrolling.
-    public static URL buildURL(int methodFlag, int pageNumber){
+    public static URL buildURL(int pageNumber){
         String queryMethod;
-        switch (methodFlag){
+        switch (mMethodFlag){
             case 0:
                 queryMethod = METHOD_MOVIE_POPULAR;
                 break;
@@ -152,6 +163,17 @@ public class MovieFetcher {
             movieCV.put(MovieContract.MovieTable.COLUMN_VOTE_AVERAGE, voteAverage);
             movieCV.put(MovieContract.MovieTable.COLUMN_BACKDROP_PATH, backdropPath);
 
+            switch (mMethodFlag){
+                case 0:
+                    movieCV.put(MovieContract.MovieTable.COLUMN_SORTED_BY, Movie.SORTED_BY_POPULARITY);
+                    break;
+                case 1:
+                    movieCV.put(MovieContract.MovieTable.COLUMN_SORTED_BY, Movie.SORTED_BY_TOP_RATED);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown value for the sorted by column");
+            }
+
             movies[i] = movieCV;
 
             Movie movie = new Movie(title, ID, posterPath, overview, releaseDate, voteCount,
@@ -167,10 +189,10 @@ public class MovieFetcher {
 
     //A helper method, which essentially combines buildURL(), getHTTPResponse(), and parseMovies()
     //all within one method.
-    public static ContentValues[] fetchMovies(int methodFlag, int pageNumber){
+    public static ContentValues[] fetchMovies(int pageNumber){
         ContentValues[] movies;
         try {
-            String httpResponse = getHTTPResponse(buildURL(methodFlag, pageNumber));
+            String httpResponse = getHTTPResponse(buildURL(pageNumber));
             movies = parseMovies(httpResponse);
         }
         catch(IOException ioe){

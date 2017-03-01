@@ -52,7 +52,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     public static final String EXTRA_METHOD_FLAG = "com.example.android.popularmovies_stage2.method_flag";
     public static final String EXTRA_PAGE_NUMBER = "com.example.android.popularmovies_stage2.page_number";
 
-    private static final int MOVIE_LOADER_ID = 0;
+    private static final int LOADER_ID_POPULARITY = 0;
+    private static final int LOADER_ID_TOP_RATED = 1;
 
     RecyclerView mRecyclerView; //Reference to the RecyclerView
     MovieAdapter mAdapter;  //MovieAdapter that will be set to mRecyclerView
@@ -68,8 +69,9 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     //class that would be more suitable.
     public int mPageNumber;    //Used to move onto the next page once the user scrolls to the bottom of
                         // the RecyclerView
-    public int mMethodFlag;    //Used to choose the correct method for sorting the movies through the
-                        // PopUp menu
+
+//    public int mMethodFlag;    //Used to choose the correct method for sorting the movies through the
+//                        // PopUp menu
 
 
     //TODO: For this activity, it doesn't make much sense to include ALL of the movie attributes
@@ -83,7 +85,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         MovieContract.MovieTable.COLUMN_VOTE_COUNT,
         MovieContract.MovieTable.COLUMN_VOTE_AVERAGE,
         MovieContract.MovieTable.COLUMN_POSTER_PATH,
-        MovieContract.MovieTable.COLUMN_BACKDROP_PATH
+        MovieContract.MovieTable.COLUMN_BACKDROP_PATH,
+        MovieContract.MovieTable.COLUMN_SORTED_BY
     };
 
     public static final int INDEX_TITLE = 0;
@@ -94,6 +97,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     public static final int INDEX_VOTE_AVERAGE = 5;
     public static final int INDEX_POSTER_PATH = 6;
     public static final int INDEX_BACKDROP_PATH = 7;
+    public static final int INDEX_SORTED_BY = 8;
 
 
     @Override
@@ -163,19 +167,41 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
 
         Intent syncMoviesIntent = new Intent(this, MovieIntentService.class);
-        syncMoviesIntent.putExtra(EXTRA_METHOD_FLAG, mMethodFlag);
+//        syncMoviesIntent.putExtra(EXTRA_METHOD_FLAG, mMethodFlag);
 //        syncMoviesIntent.putExtra(EXTRA_PAGE_NUMBER, mPageNumber);
+//        startService(syncMoviesIntent);
 
         MovieSyncUtils.initialize(this, syncMoviesIntent);
 
         //Lastly, movie data is obtained through the FetchMoviesTask class
-        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID,null,this);
+        switch (MovieFetcher.getMethodFlag()){
+            case 0:
+                getSupportLoaderManager().initLoader(LOADER_ID_POPULARITY,null,this);
+                break;
+            case 1:
+                getSupportLoaderManager().initLoader(LOADER_ID_TOP_RATED,null,this);
+                break;
+            default:
+                throw new UnsupportedOperationException("Could not recognize value of method flag within onResume()");
+        }
+
     }
 
     @Override
     protected void onResume() {
         //TODO: Make sure to perform something equivalent to restartLoader() here when implementing
         //the CursorLoader
+        switch (MovieFetcher.getMethodFlag()){
+            case 0:
+                getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY,null,this);
+                break;
+            case 1:
+                getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED,null,this);
+                break;
+            default:
+                throw new UnsupportedOperationException("Could not recognize value of method flag within onResume()");
+        }
+
         super.onResume();
     }
 
@@ -209,14 +235,14 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
                     case R.id.sort_by_popular:
                         mMoviesList.clear();    //mMoviesList is cleared in both cases so that the
                         mPageNumber = 1;        //old movie data does not remain in the RecyclerView
-                        mMethodFlag = 0;        //mMethodFlag is set for the correct button
-                        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID,null,MovieSelection.this);    //Finally, a new FetchMoviesTask is
+//                        mMethodFlag = 0;        //mMethodFlag is set for the correct button
+                        getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY,null,MovieSelection.this);    //Finally, a new FetchMoviesTask is
                         return true;                        //launched
                     case R.id.sort_by_top_rated:
                         mMoviesList.clear();
                         mPageNumber = 1;
-                        mMethodFlag = 1;
-                        getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID,null,MovieSelection.this);
+//                        mMethodFlag = 1;
+                        getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED,null,MovieSelection.this);
                         return true;
                     default:
                         return true;
@@ -254,7 +280,18 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
             //Simply fetches the movie data again, starting from the first page
             case R.id.refresh:
                 mPageNumber = 1;
-                getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID,null,this);
+
+                switch (MovieFetcher.getMethodFlag()){
+                    case 0:
+                        getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY,null,this);
+                        break;
+                    case 1:
+                        getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED,null,this);
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Could not recognize value of method flag within onResume()");
+                }
+
                 return true;
             default:
                 super.onOptionsItemSelected(item);
@@ -272,14 +309,30 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
      */
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String selection;
+        String[] selectionArgs;
+
         switch (id){
-            case MOVIE_LOADER_ID:
+            case LOADER_ID_POPULARITY:
+                selection = MOVIE_DEFAULT_PROJECTION[INDEX_SORTED_BY] + " = ?";
+                selectionArgs = new String[]{Movie.SORTED_BY_POPULARITY};
 
                 return new CursorLoader(this,
                         MovieContract.MovieTable.CONTENT_URI,
                         MOVIE_DEFAULT_PROJECTION,
-                        null,
-                        null,
+                        selection,
+                        selectionArgs,
+                        MovieContract.MovieTable._ID);
+
+            case LOADER_ID_TOP_RATED:
+                selection = MOVIE_DEFAULT_PROJECTION[INDEX_SORTED_BY] + " = ?";
+                selectionArgs = new String[]{Movie.SORTED_BY_TOP_RATED};
+
+                return new CursorLoader(this,
+                        MovieContract.MovieTable.CONTENT_URI,
+                        MOVIE_DEFAULT_PROJECTION,
+                        selection,
+                        selectionArgs,
                         MovieContract.MovieTable._ID);
 
             default:
@@ -314,7 +367,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         //TODO: Sort of concerned about using the same constants for this Bundle as what's being
         //used to launch the MovieDetails activity. Keep an eye on this.
         outState.putParcelableArrayList(EXTRA_PARCEL, mMoviesList);
-        outState.putInt(EXTRA_METHOD_FLAG, mMethodFlag);
+//        outState.putInt(EXTRA_METHOD_FLAG, mMethodFlag);
         outState.putInt(EXTRA_PAGE_NUMBER, mPageNumber);
     }
 
@@ -338,7 +391,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         //However, the value of the sorting options ListPreference corresponds to mMethodFlag, so
         //it must be parsed into an int
         int preferenceMethodFlag = Integer.parseInt(preferenceMethodFlagString);
-        mMethodFlag = preferenceMethodFlag;
+//        mMethodFlag = preferenceMethodFlag;
+        MovieFetcher.setMethodFlag(preferenceMethodFlag);
 
         //We also want to reset the page number so that the data is being pulled from the beginning
         //of the data that is pulled from TheMovieDB API
@@ -362,7 +416,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
             //Then we obtain the value of the ListPreference and parse it into an int
             String methodFlagString = sharedPreferences
                     .getString(key, getString(R.string.list_preference_sorting_options_default_value));
-            mMethodFlag = Integer.parseInt(methodFlagString);
+//            mMethodFlag = Integer.parseInt(methodFlagString);
+            MovieFetcher.setMethodFlag(Integer.parseInt(methodFlagString));
 
             //mPageNumber is also reset so that the beginning of the movie data is being pulled
             //from the API
@@ -370,10 +425,20 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
             //We also want to clear out the old data. There's no need to hold onto it (and hence,
             //display it) if the user has changed their sorting setting
-            mMoviesList.clear();
+//            mMoviesList.clear();
 
             //Finally, we relaunch the ASyncTaskLoader
-            getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID,null,this);
+            switch (MovieFetcher.getMethodFlag()){
+                case 0:
+                    getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY,null,this);
+                    break;
+                case 1:
+                    getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED,null,this);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Could not recognize value of method flag within onResume()");
+            }
+
         }
 
         //TODO: Maybe one additional setting would be to allow the user to clear out all of their
