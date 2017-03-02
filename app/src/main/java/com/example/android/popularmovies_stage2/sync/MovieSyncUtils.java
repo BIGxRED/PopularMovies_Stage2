@@ -14,7 +14,7 @@ public class MovieSyncUtils {
     private static boolean sInitialized;
 
     //TODO: Look into what 'synchronized' does and means
-    synchronized public static void initialize(@NonNull final Context context, final Intent syncMoviesIntent) {
+    synchronized public static void initialize(@NonNull final Context context) {
         if (sInitialized){
             return;
         }
@@ -34,7 +34,7 @@ public class MovieSyncUtils {
                         MovieContract.MovieTable._ID);
 
                 if (databaseContents == null || databaseContents.getCount() == 0){
-                    startImmediateSync(context, syncMoviesIntent);
+                    startImmediateSync(context);
                 }
                 databaseContents.close();
                 return null;
@@ -43,7 +43,8 @@ public class MovieSyncUtils {
         }.execute();
     }
 
-    public static void startImmediateSync(@NonNull Context context, Intent syncMoviesIntent){
+    public static void startImmediateSync(@NonNull Context context){
+        Intent syncMoviesIntent = new Intent(context, MovieIntentService.class);
         context.startService(syncMoviesIntent);
     }
 }

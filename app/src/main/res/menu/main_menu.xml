@@ -7,14 +7,6 @@ movie data-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--PopUp menu which offers the options to sort by popularity or top-rated movies-->
-    <item
-        android:id="@+id/sort_options"
-        android:title="@string/main_menu_sort_by_options"
-        app:showAsAction="always"
-        android:visible="false">
-    </item>
-
     <item
         android:id="@+id/settings"
         android:title="@string/main_menu_settings_button"

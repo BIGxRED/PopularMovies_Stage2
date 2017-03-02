@@ -16,8 +16,6 @@ public class MovieIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-//        int methodFlag = intent.getIntExtra(MovieSelection.EXTRA_METHOD_FLAG,0);
-//        Log.i(TAG, "Value of methodFlag within MovieIntentService: " + methodFlag);
 
         MovieTask.syncMovies(this);
     }

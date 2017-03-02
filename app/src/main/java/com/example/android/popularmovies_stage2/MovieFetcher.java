@@ -24,12 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/*
- This class is used in order to make use of TheMovieDB API by generating API queries, parsing
- through the returned JSON data, creating Movie objects from the received JSON data, and then
-  providing an ArrayList of Movies that can be used by the MovieSelection and MovieDetails classes.
- */
-
 public class MovieFetcher {
     private static final String TAG = "MovieFetcher";
 
@@ -46,7 +40,7 @@ public class MovieFetcher {
     private static final String PARAM_PAGE = "page";
 
     //Parameter values to be used when building the URL
-    private static final String API_KEY = "";
+    private static final String API_KEY = "ef482ced903a55abbe59f0acb7f4899c";
     private static final String LANGUAGE = "en-US";
 
     //TODO: Get a better grasp on static methods and then look over your work here. Is it really
@@ -61,11 +55,7 @@ public class MovieFetcher {
         mMethodFlag = newMethodFlag;
     }
 
-    //This method is used in order to build the URL that will be used to query the TheMovieDB. The
-    //methodFlag parameter specifies which of the two API methods will be used (either polling
-    //movies by popularity or top rated). The pageNumber parameter specifies which page of data
-    //should be obtained. The page number is used within MovieSelection in order to allow for
-    //pagination/infinite scrolling.
+
     public static URL buildURL(int pageNumber){
         String queryMethod;
         switch (mMethodFlag){
@@ -125,7 +115,7 @@ public class MovieFetcher {
 
     //This method parses through JSON data, which is expected to be provided by a String generated
     //by getHTTPResponse(). The String is parsed through, Movie objects are iteratively created and
-    //appended to an ArrayList.
+    //appended to an array of ContentValues.
     private static ContentValues[] parseMovies(String httpResponse) throws JSONException{
         JSONObject jsonRoot = new JSONObject(httpResponse);
         //All of the movies are contained within an array. The array in this case may be referred to
@@ -135,7 +125,7 @@ public class MovieFetcher {
         ContentValues[] movies = new ContentValues[jsonResults.length()];
 
         //The array is then iterated through and a Movie object is created for each entry within
-        //jsonResults. The Movie is then appended to moviesList.
+        //jsonResults. The Movie is then appended to movies.
         for (int i = 0; i < jsonResults.length(); i++){
             JSONObject jsonMovie = jsonResults.getJSONObject(i);
 
