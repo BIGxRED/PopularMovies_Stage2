@@ -2,7 +2,7 @@
 The following code is the property and sole work of Mike Palarz, a student at Udacity
  */
 
-package com.example.android.popularmovies_stage2;
+package com.example.android.popularmovies_stage2.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies_stage2.Movie;
+import com.example.android.popularmovies_stage2.R;
 import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.squareup.picasso.Picasso;
 

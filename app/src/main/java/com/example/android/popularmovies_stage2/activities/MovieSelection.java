@@ -2,34 +2,35 @@
 The following code is the property and sole work of Mike Palarz, a student at Udacity
  */
 
-package com.example.android.popularmovies_stage2;
+package com.example.android.popularmovies_stage2.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.database.DatabaseUtilsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.android.popularmovies_stage2.Movie;
+import com.example.android.popularmovies_stage2.MovieAdapter;
+import com.example.android.popularmovies_stage2.MovieFetcher;
+import com.example.android.popularmovies_stage2.R;
 import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.example.android.popularmovies_stage2.data.MovieDBHelper;
-import com.example.android.popularmovies_stage2.sync.MovieIntentService;
 import com.example.android.popularmovies_stage2.sync.MovieSyncUtils;
-
-import java.util.ArrayList;
 
 public class MovieSelection extends AppCompatActivity implements LoaderCallbacks<Cursor>,
         SharedPreferences.OnSharedPreferenceChangeListener {
@@ -109,9 +110,6 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         mRecyclerView.setHasFixedSize(true);
 
-
-        setupSharedPreferences();
-
         //Initializing the SQLite database
         MovieDBHelper dbHelper = new MovieDBHelper(this);
         mDatabase = dbHelper.getWritableDatabase();
@@ -121,7 +119,12 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         mAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
+        setupSharedPreferences();
+        setupPageNumber();
+
         MovieSyncUtils.initialize(this);
+
+        Log.i(TAG, "Value of the method flag: " + MovieFetcher.getMethodFlag());
 
         switch (MovieFetcher.getMethodFlag()){
             case 0:
@@ -252,7 +255,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
 
-        Log.i(TAG, "Number of items within Cursor in onLoadFinished()" + data.getCount());
+        Log.i(TAG, "Number of items within Cursor in onLoadFinished(): " + data.getCount());
     }
 
     /*
@@ -330,5 +333,54 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         //TODO: Maybe one additional setting would be to allow the user to clear out all of their
         //current favorited movies? Just a thought.
+    }
+
+    /*
+    * The entire purpose of this method is to ensure that the value of the page number correctly
+    * reflects the number of records within the database. We know that the database is a persistent
+    * set of data and it will remain within the phone's internal storage long after onDestroy() is
+    * called. However, the page number value, which is stored within the MovieFetcher class, is
+    * not the same case. This value may potentially be lost due to the Android lifecycle. To ensure
+    * that the correct value of page number is always used, we set its value by referring to the
+    * number of rows within the database.
+     */
+    public void setupPageNumber(){
+
+        String selection = MOVIE_DEFAULT_PROJECTION[INDEX_SORTED_BY] + " = ?";
+        String[] selectionArgs;
+
+        /*
+        * There may be a different number of records for top-rated and popular movies. Therefore,
+        * we set the values of those page numbers depending on the value of the method flag.
+         */
+        switch (MovieFetcher.getMethodFlag()){
+            case 0:
+                selectionArgs = new String[] {Movie.SORTED_BY_POPULARITY};
+                break;
+
+            case 1:
+                selectionArgs = new String[] {Movie.SORTED_BY_TOP_RATED};
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Value for method flag not possible");
+        }
+
+        Cursor cursor = mDatabase.query(MovieContract.MovieTable.TABLE_NAME,
+                MOVIE_DEFAULT_PROJECTION,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                MovieContract.MovieTable._ID);
+
+        int totalNumberOfRows = cursor.getCount();
+                        /*
+        * We also know that each page returns 20 movies. Therefore, if we divide the total
+        * number of movies by 20, then we should obtain the correct value for the page
+        * number. The page number is then set accordingly.
+         */
+        MovieFetcher.setPopularPageNumber(totalNumberOfRows/20);
+        cursor.close();
     }
 }

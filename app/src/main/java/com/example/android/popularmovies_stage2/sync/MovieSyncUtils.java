@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-import com.example.android.popularmovies_stage2.MovieSelection;
 import com.example.android.popularmovies_stage2.data.MovieContract;
 
 public class MovieSyncUtils {

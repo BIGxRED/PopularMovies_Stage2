@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLDataException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -28,6 +29,8 @@ public class MovieFetcher {
     private static final String TAG = "MovieFetcher";
 
     public static int mMethodFlag;
+    public static int mPopularPageNumber;
+    public static int mTopRatedPageNumber;
 
     //Constants used for building the base URL
     private static final String MOVIEDB_BASE_URL = "https://api.themoviedb.org/3/movie";
@@ -40,7 +43,7 @@ public class MovieFetcher {
     private static final String PARAM_PAGE = "page";
 
     //Parameter values to be used when building the URL
-    private static final String API_KEY = "ef482ced903a55abbe59f0acb7f4899c";
+    private static final String API_KEY = "";
     private static final String LANGUAGE = "en-US";
 
     //TODO: Get a better grasp on static methods and then look over your work here. Is it really
@@ -55,6 +58,21 @@ public class MovieFetcher {
         mMethodFlag = newMethodFlag;
     }
 
+    public static int getPopularPageNumber(){
+        return mPopularPageNumber;
+    }
+
+    public static void setPopularPageNumber(int newPageNumber){
+        mPopularPageNumber = newPageNumber;
+    }
+
+    public static int getTopRatedPageNumber(){
+        return mTopRatedPageNumber;
+    }
+
+    public static void setTopRatedPageNumber(int newPageNumber){
+        mTopRatedPageNumber = newPageNumber;
+    }
 
     public static URL buildURL(int pageNumber){
         String queryMethod;
@@ -179,11 +197,31 @@ public class MovieFetcher {
 
     //A helper method, which essentially combines buildURL(), getHTTPResponse(), and parseMovies()
     //all within one method.
-    public static ContentValues[] fetchMovies(int pageNumber){
+    public static ContentValues[] fetchMovies(){
         ContentValues[] movies;
+        ArrayList<ContentValues> moviesList = new ArrayList<>();
+        int pageNumber = mMethodFlag == 0 ? mPopularPageNumber : mTopRatedPageNumber;
+
+        /*
+        * The first time the app is ever loaded (upon installation), the values of both page number
+        * variables will be the default value of an int, which is 0. This will cause the app to
+        * attempt to query TheMovieDB w/ a 0 page number, which will return an empty result because
+        * no such page number exists. To get around this issue, we check for this and set the
+        * pageNumber variable to 1.
+        */
+
+        if (pageNumber == 0){
+            pageNumber = 1;
+        }
+
+        int max = pageNumber + 5;
+
         try {
-            String httpResponse = getHTTPResponse(buildURL(pageNumber));
-            movies = parseMovies(httpResponse);
+            while(pageNumber < max) {
+                String httpResponse = getHTTPResponse(buildURL(pageNumber));
+                moviesList.addAll(Arrays.asList(parseMovies(httpResponse)));
+                pageNumber++;
+            }
         }
         catch(IOException ioe){
             movies = null;
@@ -193,6 +231,24 @@ public class MovieFetcher {
             movies = null;
             je.printStackTrace();
         }
+        updatePageNumber(pageNumber);
+
+        movies = moviesList.toArray(new ContentValues[0]);
+        moviesList = null;
+
         return movies;
+    }
+
+    private static void updatePageNumber(int newPageNumber){
+        switch (mMethodFlag){
+            case 0:
+                mPopularPageNumber = newPageNumber;
+                break;
+            case 1:
+                mTopRatedPageNumber = newPageNumber;
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown value for the page number");
+        }
     }
 }

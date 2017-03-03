@@ -13,25 +13,20 @@ public class MovieTask {
     public static final String TAG = "MovieTask";
 
     synchronized public static void syncMovies(Context context){
-        int pageNumber = 1;
-        ContentValues[] popularMovies;
-        ContentValues[] topRatedMovies;
+
+        MovieFetcher.setMethodFlag(0);
+        ContentValues[] popularMovies = MovieFetcher.fetchMovies();
+        MovieFetcher.setMethodFlag(1);
+        ContentValues[] topRatedMovies = MovieFetcher.fetchMovies();
+
         ContentResolver resolver = context.getContentResolver();
 
-        while(pageNumber < 6){
-
-            MovieFetcher.setMethodFlag(0);
-            popularMovies = MovieFetcher.fetchMovies(pageNumber);
-            MovieFetcher.setMethodFlag(1);
-            topRatedMovies = MovieFetcher.fetchMovies(pageNumber);
-
             if (popularMovies != null && popularMovies.length > 0 && topRatedMovies != null && topRatedMovies.length > 0){
-                int popularMoviesCount = resolver.bulkInsert(MovieContract.MovieTable.CONTENT_URI,popularMovies);
-                int topRatedMoviesCount = resolver.bulkInsert(MovieContract.MovieTable.CONTENT_URI,topRatedMovies);
+                int popularMoviesCount = resolver.bulkInsert(MovieContract.MovieTable.CONTENT_URI, popularMovies);
+                int topRatedMoviesCount = resolver.bulkInsert(MovieContract.MovieTable.CONTENT_URI, topRatedMovies);
                 Log.i(TAG, "Number of popular movies inserted: " + popularMoviesCount);
                 Log.i(TAG, "Number of top rated movies inserted: " + topRatedMoviesCount);
             }
-            pageNumber++;
-        }
+
     }
 }

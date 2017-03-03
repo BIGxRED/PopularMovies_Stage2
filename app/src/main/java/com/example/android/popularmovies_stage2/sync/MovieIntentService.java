@@ -2,9 +2,6 @@ package com.example.android.popularmovies_stage2.sync;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
-
-import com.example.android.popularmovies_stage2.MovieSelection;
 
 public class MovieIntentService extends IntentService {
 

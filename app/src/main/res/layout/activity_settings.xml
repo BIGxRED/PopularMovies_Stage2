@@ -3,6 +3,6 @@
     android:id="@+id/activity_settings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:name="com.example.android.popularmovies_stage2.SettingsFragment">
+    android:name="com.example.android.popularmovies_stage2.fragments.SettingsFragment">
 
 </fragment>
