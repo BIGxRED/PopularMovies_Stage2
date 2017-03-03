@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder> {
+
+    private static final String TAG = "MovieAdapter";
 
     private final Context adapterContext;
     private Cursor adapterCursor;
@@ -43,7 +46,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
     public void onBindViewHolder(MovieHolder holder, int position){
         adapterCursor.moveToPosition(position);
 
-        String moviePoster = adapterCursor.getString(adapterCursor.getColumnIndex(MovieContract.MovieTable.COLUMN_POSTER_PATH));
+        String moviePoster = adapterCursor.getString(MovieSelection.INDEX_POSTER_PATH);
 
         Picasso.with(adapterContext)
                 .load("https://image.tmdb.org/t/p/w185/" + moviePoster)

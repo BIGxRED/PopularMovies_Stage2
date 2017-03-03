@@ -7,13 +7,11 @@ package com.example.android.popularmovies_stage2.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.database.DatabaseUtilsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -56,41 +54,19 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     ProgressBar mProgressBar;   //ProgressBar which is used to show that data is being loaded
     TextView mErrorMessageTextView; //TextView which is shown in case data could not be retrieved
 
-    //TODO: Should this variable be a part of this class? It made sense previously. However, since
-    //you're now using services to load the movie data, it may be better to move this to another
-    //class that would be more suitable.
-
-//    public int mPageNumber;    //Used to move onto the next page once the user scrolls to the bottom of
-                        // the RecyclerView
-
-//    public int mMethodFlag;    //Used to choose the correct method for sorting the movies through the
-//                        // PopUp menu
-
 
     //TODO: For this activity, it doesn't make much sense to include ALL of the movie attributes
     //since all we really care about is the movie poster. Adjust this later on once you have the
     //posters displaying again
-    public static final String[] MOVIE_DEFAULT_PROJECTION = {
-        MovieContract.MovieTable.COLUMN_TITLE,
+    public static final String[] MOVIE_SELECTION_PROJECTION = {
         MovieContract.MovieTable.COLUMN_MOVIE_ID,
-        MovieContract.MovieTable.COLUMN_OVERVIEW,
-        MovieContract.MovieTable.COLUMN_RELEASE_DATE,
-        MovieContract.MovieTable.COLUMN_VOTE_COUNT,
-        MovieContract.MovieTable.COLUMN_VOTE_AVERAGE,
         MovieContract.MovieTable.COLUMN_POSTER_PATH,
-        MovieContract.MovieTable.COLUMN_BACKDROP_PATH,
         MovieContract.MovieTable.COLUMN_SORTED_BY
     };
 
-    public static final int INDEX_TITLE = 0;
-    public static final int INDEX_MOVIE_ID = 1;
-    public static final int INDEX_OVERVIEW = 2;
-    public static final int INDEX_RELEASE_DATE = 3;
-    public static final int INDEX_VOTE_COUNT = 4;
-    public static final int INDEX_VOTE_AVERAGE = 5;
-    public static final int INDEX_POSTER_PATH = 6;
-    public static final int INDEX_BACKDROP_PATH = 7;
-    public static final int INDEX_SORTED_BY = 8;
+    public static final int INDEX_MOVIE_ID = 0;
+    public static final int INDEX_POSTER_PATH = 1;
+    public static final int INDEX_SORTED_BY = 2;
 
 
     @Override
@@ -222,23 +198,23 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         switch (id){
             case LOADER_ID_POPULARITY:
-                selection = MOVIE_DEFAULT_PROJECTION[INDEX_SORTED_BY] + " = ?";
+                selection = MOVIE_SELECTION_PROJECTION[INDEX_SORTED_BY] + " = ?";
                 selectionArgs = new String[]{Movie.SORTED_BY_POPULARITY};
 
                 return new CursorLoader(this,
                         MovieContract.MovieTable.CONTENT_URI,
-                        MOVIE_DEFAULT_PROJECTION,
+                        MOVIE_SELECTION_PROJECTION,
                         selection,
                         selectionArgs,
                         MovieContract.MovieTable._ID);
 
             case LOADER_ID_TOP_RATED:
-                selection = MOVIE_DEFAULT_PROJECTION[INDEX_SORTED_BY] + " = ?";
+                selection = MOVIE_SELECTION_PROJECTION[INDEX_SORTED_BY] + " = ?";
                 selectionArgs = new String[]{Movie.SORTED_BY_TOP_RATED};
 
                 return new CursorLoader(this,
                         MovieContract.MovieTable.CONTENT_URI,
-                        MOVIE_DEFAULT_PROJECTION,
+                        MOVIE_SELECTION_PROJECTION,
                         selection,
                         selectionArgs,
                         MovieContract.MovieTable._ID);
@@ -346,7 +322,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
      */
     public void setupPageNumber(){
 
-        String selection = MOVIE_DEFAULT_PROJECTION[INDEX_SORTED_BY] + " = ?";
+        String selection = MOVIE_SELECTION_PROJECTION[INDEX_SORTED_BY] + " = ?";
         String[] selectionArgs;
 
         /*
@@ -367,7 +343,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         }
 
         Cursor cursor = mDatabase.query(MovieContract.MovieTable.TABLE_NAME,
-                MOVIE_DEFAULT_PROJECTION,
+                MOVIE_SELECTION_PROJECTION,
                 selection,
                 selectionArgs,
                 null,

@@ -37,7 +37,6 @@ public class MovieContentProvider extends ContentProvider {
 
         switch (sMatcher.match(uri)){
             case MOVIES:
-                projection = null;
                 cursor = mDBHelper.getReadableDatabase().query(MovieContract.MovieTable.TABLE_NAME,
                         projection,
                         selection,
@@ -49,7 +48,6 @@ public class MovieContentProvider extends ContentProvider {
 
             case MOVIE_WITH_ID:
                 String movieID = uri.getLastPathSegment();
-                projection = null;
                 selection = MovieContract.MovieTable.COLUMN_MOVIE_ID + " = ?";
                 selectionArgs = new String[]{movieID};
 
