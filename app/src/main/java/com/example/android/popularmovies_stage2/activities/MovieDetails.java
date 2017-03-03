@@ -58,7 +58,6 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
 
     public static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieContract.MovieTable.COLUMN_TITLE,
-            MovieContract.MovieTable.COLUMN_MOVIE_ID,
             MovieContract.MovieTable.COLUMN_OVERVIEW,
             MovieContract.MovieTable.COLUMN_RELEASE_DATE,
             MovieContract.MovieTable.COLUMN_VOTE_COUNT,
@@ -67,12 +66,11 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
     };
 
     public static final int INDEX_TITLE = 0;
-    public static final int INDEX_MOVIE_ID = 1;
-    public static final int INDEX_OVERVIEW = 2;
-    public static final int INDEX_RELEASE_DATE = 3;
-    public static final int INDEX_VOTE_COUNT = 4;
-    public static final int INDEX_VOTE_AVERAGE = 5;
-    public static final int INDEX_POSTER_PATH = 6;
+    public static final int INDEX_OVERVIEW = 1;
+    public static final int INDEX_RELEASE_DATE = 2;
+    public static final int INDEX_VOTE_COUNT = 3;
+    public static final int INDEX_VOTE_AVERAGE = 4;
+    public static final int INDEX_POSTER_PATH = 5;
 
     private static final int DETAIL_LOADER_ID = 0;
 
@@ -97,55 +95,8 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
             throw new NullPointerException("Uri for the selected movie cannot be null");
         }
 
-        //If the received intent contains the parcelable array, then refer mMoviesList to this
-        //array and display the contents of each movie.
-
-//        if(receivedIntent.hasExtra(MovieSelection.EXTRA_PARCEL)){
-//            mMoviesList = receivedIntent.getParcelableArrayListExtra(MovieSelection.EXTRA_PARCEL);
-//            Log.i(TAG, "\nReceived movies: \n");
-//            for(int i = 0; i < mMoviesList.size(); i++){
-//                Movie currentMovie = mMoviesList.get(i);
-//                Log.i(TAG, currentMovie.toString());
-//            }
-//        }
-
-        //If the parcelable array wasn't not found, then set mMoviesList to null and show
-        //an error message
-
-//        else{
-//            mMoviesList = null;
-//            Log.e(TAG, "Movies list is null...");
-//        }
-
-        //TODO: Later on, when you're ready to implement the ViewPager again, make sure to uncomment
-        //these 2 lines
-//        mViewPager = (ViewPager) findViewById(R.id.viewpager);
-//        mViewPager.setAdapter(new MoviePagerAdapter(this));
-
         getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
 
-
-        //The movie ID was also sent from MovieSelection. We check the availability of this data
-        //in a similar way as was done with mMoviesList
-
-//        int receivedMovieID = 0;
-//        if (receivedIntent.hasExtra(MovieSelection.EXTRA_ID))
-//            receivedMovieID = receivedIntent.getIntExtra(MovieSelection.EXTRA_ID, 0);
-
-        //We then iterate through mMoviesList, searching for the movie ID received from
-        //MovieSelection. If the movie ID matches receivedMovieID, then the ViewPager is set to
-        //that movie. This ensures that when the user clicks on a movie poster within MovieSelection,
-        //they are brought to the movie details page of the movie that was clicked. If this for
-        //loop is not used, then the user is brought to the first movie within mMoviesList, which
-        //is not the movie that was clicked on in most cases.
-
-//        for(int k = 0; k < mMoviesList.size(); k++){
-//            if(mMoviesList.get(k).getID() == receivedMovieID){
-//                mViewPager.setCurrentItem(k);
-//                break;
-//            }
-//        }
-//        Log.e(TAG, "Movie ID was never found within the ArrayList...");
 
     }
 
@@ -285,7 +236,6 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
             return;
         }
 
-
         String title = data.getString(INDEX_TITLE);
         String overview = data.getString(INDEX_OVERVIEW);
         String releaseDate = data.getString(INDEX_RELEASE_DATE);
@@ -294,7 +244,7 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         String posterPath = data.getString(INDEX_POSTER_PATH);
 
         Picasso.with(getApplicationContext())
-                .load("https://image.tmdb.org/t/p/w185/" + mMoviePoster)
+                .load("https://image.tmdb.org/t/p/w185/" + posterPath)
                 .into(mMoviePoster);
 
         mMovieTitle.setText(title);
