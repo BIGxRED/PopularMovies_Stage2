@@ -28,7 +28,9 @@
     <string name="list_preference_sorting_options_key">spkey_sorting_options</string>
     <string name="list_preference_sorting_options_entry_popularity">Popularity</string>
     <string name="list_preference_sorting_options_entry_top_rated">Top Rated</string>
+    <string name="list_preference_sorting_options_entry_favorites">Favorites</string>
     <string name="list_preference_sorting_options_entry_value_popularity">0</string>
     <string name="list_preference_sorting_options_entry_value_top_rated">1</string>
+    <string name="list_preference_sorting_options_entry_value_favorites">2</string>
 
 </resources>

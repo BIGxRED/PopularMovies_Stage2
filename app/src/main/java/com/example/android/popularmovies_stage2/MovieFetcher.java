@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.android.popularmovies_stage2.data.MovieContract;
+import com.example.android.popularmovies_stage2.fragments.SettingsFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,20 +81,28 @@ public class MovieFetcher {
     //make much sense to use this value if we are also storing the same values within SharedPreferences.
     //Start by rewriting this method and include a context as one of the parameters. That way, you
     //can get a reference to SharedPreferences.
-    public static URL buildURL(int pageNumber){
-
+    public static URL buildURL(Context context, int pageNumber){
         String queryMethod;
-        switch (mMethodFlag){
+        String methodFlagKey = context.getString(R.string.list_preference_sorting_options_key);
+        int methodFlag = SettingsFragment.getPreferenceValue(context, methodFlagKey);
+
+        switch (methodFlag){
             case 0:
                 queryMethod = METHOD_MOVIE_POPULAR;
                 break;
+
             case 1:
                 queryMethod = METHOD_MOVIE_TOP_RATED;
                 break;
+
+            case 2:
+                throw new UnsupportedOperationException("Can't build a URL for favorite movies");
+
             default:
                 queryMethod = METHOD_MOVIE_POPULAR;
                 break;
         }
+
 
         //A Uri is first built according to TheMovieDB API's documentation
         Uri builtUri = Uri.parse(MOVIEDB_BASE_URL).buildUpon()
@@ -208,10 +217,30 @@ public class MovieFetcher {
 
     //A helper method, which essentially combines buildURL(), getHTTPResponse(), and parseMovies()
     //all within one method.
-    public static ContentValues[] fetchMovies(){
+    public static ContentValues[] fetchMovies(Context context){
         ContentValues[] movies;
         ArrayList<ContentValues> moviesList = new ArrayList<>();
-        int pageNumber = mMethodFlag == 0 ? mPopularPageNumber : mTopRatedPageNumber;
+        int pageNumber;
+
+        String methodFlagKey = context.getString(R.string.list_preference_sorting_options_key);
+        int methodFlag = SettingsFragment.getPreferenceValue(context, methodFlagKey);
+
+        switch (methodFlag){
+            case 0:
+                pageNumber = mPopularPageNumber;
+                break;
+
+            case 1:
+                pageNumber = mTopRatedPageNumber;
+                break;
+
+            case 2:
+                throw new UnsupportedOperationException("Can't fetch data with favorite movies");
+
+            default:
+                throw new UnsupportedOperationException("Unknown value for method flag");
+        }
+
 
         /*
         * The first time the app is ever loaded (upon installation), the values of both page number
@@ -229,20 +258,23 @@ public class MovieFetcher {
 
         try {
             while(pageNumber < max) {
-                String httpResponse = getHTTPResponse(buildURL(pageNumber));
+                String httpResponse = getHTTPResponse(buildURL(context, pageNumber));
                 moviesList.addAll(Arrays.asList(parseMovies(httpResponse)));
                 pageNumber++;
             }
         }
+
         catch(IOException ioe){
             movies = null;
             ioe.printStackTrace();
         }
+
         catch(JSONException je){
             movies = null;
             je.printStackTrace();
         }
-        updatePageNumber(pageNumber);
+
+        updatePageNumber(context, pageNumber);
 
         movies = moviesList.toArray(new ContentValues[0]);
         moviesList = null;
@@ -250,16 +282,28 @@ public class MovieFetcher {
         return movies;
     }
 
-    private static void updatePageNumber(int newPageNumber){
-        switch (mMethodFlag){
+    private static void updatePageNumber(Context context, int newPageNumber){
+
+        //TODO: Once mMethodFlag is completely removed, maybe create a helper method to do all of
+        //this for you
+        String methodFlagKey = context.getString(R.string.list_preference_sorting_options_key);
+        int methodFlag = SettingsFragment.getPreferenceValue(context, methodFlagKey);
+
+        switch (methodFlag){
             case 0:
                 mPopularPageNumber = newPageNumber;
                 break;
+
             case 1:
                 mTopRatedPageNumber = newPageNumber;
                 break;
+
+            case 2:
+                throw new UnsupportedOperationException("Cannot update page number for favorites");
+
             default:
                 throw new UnsupportedOperationException("Unknown value for the page number");
         }
     }
+
 }

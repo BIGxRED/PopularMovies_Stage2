@@ -28,6 +28,7 @@ import com.example.android.popularmovies_stage2.MovieFetcher;
 import com.example.android.popularmovies_stage2.R;
 import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.example.android.popularmovies_stage2.data.MovieDBHelper;
+import com.example.android.popularmovies_stage2.fragments.SettingsFragment;
 import com.example.android.popularmovies_stage2.sync.MovieSyncUtils;
 
 public class MovieSelection extends AppCompatActivity implements LoaderCallbacks<Cursor>,
@@ -58,12 +59,14 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     public static final String[] MOVIE_SELECTION_PROJECTION = {
         MovieContract.MovieTable.COLUMN_MOVIE_ID,
         MovieContract.MovieTable.COLUMN_POSTER_PATH,
-        MovieContract.MovieTable.COLUMN_SORTED_BY
+        MovieContract.MovieTable.COLUMN_SORTED_BY,
+        MovieContract.MovieTable.COLUMN_FAVORITE
     };
 
     public static final int INDEX_MOVIE_ID = 0;
     public static final int INDEX_POSTER_PATH = 1;
     public static final int INDEX_SORTED_BY = 2;
+    public static final int INDEX_FAVORITE = 3;
 
 
     @Override
@@ -99,15 +102,24 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         Log.i(TAG, "Value of the method flag: " + MovieFetcher.getMethodFlag());
 
-        switch (MovieFetcher.getMethodFlag()){
+        String methodFlagKey = getString(R.string.list_preference_sorting_options_key);
+        int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
+
+
+        switch (methodFlag){
             case 0:
-                getSupportLoaderManager().initLoader(LOADER_ID_POPULARITY,null,this);
+                getSupportLoaderManager().initLoader(LOADER_ID_POPULARITY, null, this);
                 break;
+
             case 1:
-                getSupportLoaderManager().initLoader(LOADER_ID_TOP_RATED,null,this);
+                getSupportLoaderManager().initLoader(LOADER_ID_TOP_RATED, null, this);
                 break;
+
+            case 2:
+                getSupportLoaderManager().initLoader(LOADER_ID_FAVORITES, null, this);
+
             default:
-                throw new UnsupportedOperationException("Could not recognize value of method flag within onResume()");
+                throw new UnsupportedOperationException("Could not recognize value of method flag within onCreate()");
         }
 
 
@@ -117,13 +129,23 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     @Override
     protected void onResume() {
 
-        switch (MovieFetcher.getMethodFlag()){
+        String methodFlagKey = getString(R.string.list_preference_sorting_options_key);
+        int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
+        Log.i(TAG, "Value of methodFlag within onResume(): " + methodFlag);
+
+        switch (methodFlag){
             case 0:
-                getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY,null,this);
+                getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY, null, this);
                 break;
+
             case 1:
-                getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED,null,this);
+                getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED, null, this);
                 break;
+
+            case 2:
+                getSupportLoaderManager().restartLoader(LOADER_ID_FAVORITES, null, this);
+                break;
+
             default:
                 throw new UnsupportedOperationException("Could not recognize value of method flag within onResume()");
         }
@@ -216,6 +238,17 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
                         selectionArgs,
                         MovieContract.MovieTable._ID);
 
+            case LOADER_ID_FAVORITES:
+                selection = MOVIE_SELECTION_PROJECTION[INDEX_FAVORITE] + " = ?";
+                selectionArgs = new String [] {"1"};
+
+                return new CursorLoader(this,
+                        MovieContract.MovieTable.CONTENT_URI,
+                        MOVIE_SELECTION_PROJECTION,
+                        selection,
+                        selectionArgs,
+                        MovieContract.MovieTable._ID);
+
             default:
                 throw new RuntimeException("This type of loader with ID" + id + " was not implemented.");
         }
@@ -297,13 +330,19 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
             //Finally, we relaunch the CursorLoader
             switch (MovieFetcher.getMethodFlag()){
                 case 0:
-                    getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY,null,this);
+                    getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY, null, this);
                     break;
+
                 case 1:
-                    getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED,null,this);
+                    getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED, null, this);
                     break;
+
+                case 2:
+                    getSupportLoaderManager().restartLoader(LOADER_ID_FAVORITES, null, this);
+                    break;
+
                 default:
-                    throw new UnsupportedOperationException("Could not recognize value of method flag within onResume()");
+                    throw new UnsupportedOperationException("Could not recognize value of method flag within onSharedPreferenceChanged()");
             }
 
         }
@@ -322,42 +361,73 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     * number of rows within the database.
      */
     public void setupPageNumber(){
-
-        String selection = MOVIE_SELECTION_PROJECTION[INDEX_SORTED_BY] + " = ?";
+        String selection;
         String[] selectionArgs;
+        Cursor cursor;
+        int totalNumberOfRows;
+
+        String methodFlagKey = getString(R.string.list_preference_sorting_options_key);
+        int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
 
         /*
         * There may be a different number of records for top-rated and popular movies. Therefore,
         * we set the values of those page numbers depending on the value of the method flag.
          */
-        switch (MovieFetcher.getMethodFlag()){
+        switch (methodFlag){
             case 0:
+                selection = MOVIE_SELECTION_PROJECTION[INDEX_SORTED_BY] + " = ?";
                 selectionArgs = new String[] {Movie.SORTED_BY_POPULARITY};
+
+                cursor = mDatabase.query(MovieContract.MovieTable.TABLE_NAME,
+                        MOVIE_SELECTION_PROJECTION,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        MovieContract.MovieTable._ID);
+
+                totalNumberOfRows = cursor.getCount();
+
+                /*
+                * We also know that each page returns 20 movies. Therefore, if we divide the total
+                * number of movies by 20, then we should obtain the correct value for the page
+                * number. The page number is then set accordingly.
+                 */
+                MovieFetcher.setPopularPageNumber(totalNumberOfRows/20);
+                cursor.close();
+
                 break;
 
             case 1:
+                selection = MOVIE_SELECTION_PROJECTION[INDEX_SORTED_BY] + " = ?";
                 selectionArgs = new String[] {Movie.SORTED_BY_TOP_RATED};
+
+                cursor = mDatabase.query(MovieContract.MovieTable.TABLE_NAME,
+                        MOVIE_SELECTION_PROJECTION,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        MovieContract.MovieTable._ID);
+
+                totalNumberOfRows = cursor.getCount();
+
+                MovieFetcher.setTopRatedPageNumber(totalNumberOfRows/20);
+                cursor.close();
+
                 break;
+
+            /*
+            If we're currently looking at favorite movies, then page numbers don't apply. Therefore,
+            we simply return from this method.
+             */
+            case 2:
+                return;
+
 
             default:
                 throw new UnsupportedOperationException("Value for method flag not possible");
         }
 
-        Cursor cursor = mDatabase.query(MovieContract.MovieTable.TABLE_NAME,
-                MOVIE_SELECTION_PROJECTION,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                MovieContract.MovieTable._ID);
-
-        int totalNumberOfRows = cursor.getCount();
-                        /*
-        * We also know that each page returns 20 movies. Therefore, if we divide the total
-        * number of movies by 20, then we should obtain the correct value for the page
-        * number. The page number is then set accordingly.
-         */
-        MovieFetcher.setPopularPageNumber(totalNumberOfRows/20);
-        cursor.close();
     }
 }

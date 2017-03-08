@@ -4,16 +4,13 @@
     <array name="list_preference_sorting_options_entries">
         <item>@string/list_preference_sorting_options_entry_popularity</item>
         <item>@string/list_preference_sorting_options_entry_top_rated</item>
+        <item>@string/list_preference_sorting_options_entry_favorites</item>
     </array>
 
     <array name="list_preference_sorting_options_entry_values">
         <item>@string/list_preference_sorting_options_entry_value_popularity</item>
         <item>@string/list_preference_sorting_options_entry_value_top_rated</item>
+        <item>@string/list_preference_sorting_options_entry_value_favorites</item>
     </array>
-
-    <!--<item>0</item>-->
-    <!--<item>1</item>-->
-
-
 
 </resources>
