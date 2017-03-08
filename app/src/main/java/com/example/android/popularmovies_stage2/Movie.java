@@ -23,13 +23,15 @@ public class Movie implements Parcelable {
     int mVoteCount; //integer used to store the number of votes a movie received
     float mVoteAverage; //float used to store the average vote value
     String mBackdropPath;   //String used to store the relative path of the movie backdrop image
+    int mRuntime;
+    boolean mFavorite;
 
     public static final String SORTED_BY_POPULARITY = "popularity";
     public static final String SORTED_BY_TOP_RATED = "top rated";
 
     //Default constructor of a Movie object
     public Movie(String title, int ID, String posterPath, String overview, String releaseDate,
-                 int voteCount, float voteAverage, String backdropPath){
+                 int voteCount, float voteAverage, String backdropPath, int runtime, boolean favorite){
         mTitle = title;
         mID = ID;
         mPosterPath = posterPath;
@@ -38,6 +40,8 @@ public class Movie implements Parcelable {
         mVoteCount = voteCount;
         mVoteAverage = voteAverage;
         mBackdropPath = backdropPath;
+        mRuntime = runtime;
+        mFavorite = favorite;
     }
 
     //Constructor required to implement the Parcelable interface
@@ -50,6 +54,8 @@ public class Movie implements Parcelable {
         mVoteCount = in.readInt();
         mVoteAverage = in.readFloat();
         mBackdropPath = in.readString();
+        mRuntime = in.readInt();
+        mFavorite = in.readByte() != 0;
     }
 
     /*Getter and Setter Methods*/
@@ -118,6 +124,22 @@ public class Movie implements Parcelable {
         this.mBackdropPath = mBackdropPath;
     }
 
+    public int getRuntime(){
+        return mRuntime;
+    }
+
+    public void setRuntime(int runtime){
+        mRuntime = runtime;
+    }
+
+    public boolean getFavorite(){
+        return mFavorite;
+    }
+
+    public void setFavorite(boolean favorite){
+        mFavorite = favorite;
+    }
+
     @Override
     public String toString(){
         return "Title: " + mTitle
@@ -127,7 +149,10 @@ public class Movie implements Parcelable {
                + "\nRelease date: " + mReleaseDate
                + "\nVote count: " + Integer.toString(mVoteCount)
                + "\nVote average: " + Float.toString(mVoteAverage)
-               + "\nBackdrop path: " + mBackdropPath + "\n";
+               + "\nBackdrop path: " + mBackdropPath
+               + "\nRuntime: " + mRuntime
+               + "\nFavorite movie?: " + mFavorite
+               + "\n";
     }
 
     /* Methods required for the parcelable interface*/
@@ -151,6 +176,8 @@ public class Movie implements Parcelable {
         out.writeInt(mVoteCount);
         out.writeFloat(mVoteAverage);
         out.writeString(mBackdropPath);
+        out.writeInt(mRuntime);
+        out.writeByte((byte) (mFavorite ? 1 : 0));
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>(){

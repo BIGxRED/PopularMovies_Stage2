@@ -1,11 +1,14 @@
 package com.example.android.popularmovies_stage2.fragments;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.PreferenceScreen;
 
 import com.example.android.popularmovies_stage2.R;
@@ -90,6 +93,21 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 String value = sharedPreferences.getString(preference.getKey(),"");
                 setPreferenceSummary(preference, value);
             }
+        }
+    }
+
+    public static int getPreferenceValue(Context context, String key){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (key == context.getString(R.string.list_preference_sorting_options_key)){
+            String sortingOptionsValueString = preferences.getString(key,
+                    context.getString(R.string.list_preference_sorting_options_default_value));
+
+            int sortingOptionsValue = Integer.parseInt(sortingOptionsValueString);
+            return sortingOptionsValue;
+        }
+        else {
+            return 0;
         }
     }
 }

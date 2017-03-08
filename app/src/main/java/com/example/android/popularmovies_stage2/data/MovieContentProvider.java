@@ -184,6 +184,33 @@ public class MovieContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        int updatedRowsCount;
+
+        final SQLiteDatabase database = mDBHelper.getWritableDatabase();
+
+        switch (sMatcher.match(uri)){
+            case MOVIES:
+                updatedRowsCount = database.update(MovieContract.MovieTable.TABLE_NAME, values,
+                        selection, selectionArgs);
+                break;
+
+            case MOVIE_WITH_ID:
+                String movieID = uri.getLastPathSegment();
+                selection = MovieContract.MovieTable.COLUMN_MOVIE_ID + " = ?";
+                selectionArgs = new String[]{movieID};
+
+                updatedRowsCount = database.update(MovieContract.MovieTable.TABLE_NAME, values,
+                        selection, selectionArgs);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (updatedRowsCount > 0){
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
         return 0;
     }
 

@@ -28,6 +28,8 @@ public class MovieContract {
         public static final String COLUMN_POSTER_PATH = "posterPath";
         public static final String COLUMN_BACKDROP_PATH = "backdropPath";
         public static final String COLUMN_SORTED_BY = "sortedBy";
+        public static final String COLUMN_RUNTIME = "runtime";
+        public static final String COLUMN_FAVORITE = "favorite";
 
     }
 }

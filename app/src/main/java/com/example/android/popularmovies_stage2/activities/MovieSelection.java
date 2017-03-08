@@ -45,6 +45,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
     private static final int LOADER_ID_POPULARITY = 0;
     private static final int LOADER_ID_TOP_RATED = 1;
+    private static final int LOADER_ID_FAVORITES = 2;
 
     RecyclerView mRecyclerView; //Reference to the RecyclerView
     MovieAdapter mAdapter;  //MovieAdapter that will be set to mRecyclerView
@@ -54,10 +55,6 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     ProgressBar mProgressBar;   //ProgressBar which is used to show that data is being loaded
     TextView mErrorMessageTextView; //TextView which is shown in case data could not be retrieved
 
-
-    //TODO: For this activity, it doesn't make much sense to include ALL of the movie attributes
-    //since all we really care about is the movie poster. Adjust this later on once you have the
-    //posters displaying again
     public static final String[] MOVIE_SELECTION_PROJECTION = {
         MovieContract.MovieTable.COLUMN_MOVIE_ID,
         MovieContract.MovieTable.COLUMN_POSTER_PATH,
@@ -245,6 +242,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         mAdapter.swapCursor(null);
     }
 
+
+    //TODO: Maybe call super() in here if you're not using it
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -266,6 +265,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         //Obtain the current value of the sorting options setting, which is stored as a String.
         String preferenceMethodFlagString = preferences.getString(getString(R.string.list_preference_sorting_options_key),
                getString(R.string.list_preference_sorting_options_default_value));
+
+//        int test = preferences.getInt(getString(R.string.list_preference_sorting_options_key), 0);
 
         //However, the value of the sorting options ListPreference corresponds to the method flag
         //of the MovieFetcher class. Therefore, it needs to be set accordingly by being parsed into

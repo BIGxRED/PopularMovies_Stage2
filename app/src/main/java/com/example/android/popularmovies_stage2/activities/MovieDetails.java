@@ -4,6 +4,7 @@ The following code is the property and sole work of Mike Palarz, a student at Ud
 
 package com.example.android.popularmovies_stage2.activities;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,12 +20,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies_stage2.Movie;
 import com.example.android.popularmovies_stage2.R;
 import com.example.android.popularmovies_stage2.data.MovieContract;
+import com.example.android.popularmovies_stage2.data.MovieDBHelper;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -58,23 +61,30 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
 
     public static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieContract.MovieTable.COLUMN_TITLE,
+            MovieContract.MovieTable.COLUMN_MOVIE_ID,
             MovieContract.MovieTable.COLUMN_OVERVIEW,
             MovieContract.MovieTable.COLUMN_RELEASE_DATE,
             MovieContract.MovieTable.COLUMN_VOTE_COUNT,
             MovieContract.MovieTable.COLUMN_VOTE_AVERAGE,
             MovieContract.MovieTable.COLUMN_POSTER_PATH,
+            MovieContract.MovieTable.COLUMN_RUNTIME,
+            MovieContract.MovieTable.COLUMN_FAVORITE
     };
 
     public static final int INDEX_TITLE = 0;
-    public static final int INDEX_OVERVIEW = 1;
-    public static final int INDEX_RELEASE_DATE = 2;
-    public static final int INDEX_VOTE_COUNT = 3;
-    public static final int INDEX_VOTE_AVERAGE = 4;
-    public static final int INDEX_POSTER_PATH = 5;
+    public static final int INDEX_MOVIE_ID = 1;
+    public static final int INDEX_OVERVIEW = 2;
+    public static final int INDEX_RELEASE_DATE = 3;
+    public static final int INDEX_VOTE_COUNT = 4;
+    public static final int INDEX_VOTE_AVERAGE = 5;
+    public static final int INDEX_POSTER_PATH = 6;
+    public static final int INDEX_RUNTIME = 7;
+    public static final int INDEX_FAVORITE = 8;
 
     private static final int DETAIL_LOADER_ID = 0;
 
     private Uri mMovieUri;
+    private int mMovieID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +104,8 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         if (mMovieUri == null){
             throw new NullPointerException("Uri for the selected movie cannot be null");
         }
+
+        mMovieID = Integer.parseInt(mMovieUri.getLastPathSegment());
 
         getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
 
@@ -273,5 +285,32 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         //Nothing to be done within this method yet
+    }
+
+    public void onFavoriteClicked(View view){
+        boolean checked = ((CheckBox) view).isChecked();
+        ContentValues updatedValues = new ContentValues();
+
+        if (checked){
+            updatedValues.put(MOVIE_DETAIL_PROJECTION[INDEX_FAVORITE], Boolean.TRUE);
+        }
+        else {
+            updatedValues.put(MOVIE_DETAIL_PROJECTION[INDEX_FAVORITE], Boolean.FALSE);
+        }
+
+        getContentResolver().update(mMovieUri, updatedValues, null, null);
+
+        //TODO: Since this is only used for debugging, make sure to remove this once you're
+        //comfortable that this works
+        Cursor cursor = getContentResolver().query(MovieContract.MovieTable.CONTENT_URI,
+                MOVIE_DETAIL_PROJECTION,
+                MOVIE_DETAIL_PROJECTION[INDEX_MOVIE_ID] + " = ?",
+                new String[] {Integer.toString(mMovieID)},
+                null);
+
+        cursor.moveToFirst();
+        boolean favoriteValue = cursor.getInt(INDEX_FAVORITE) > 0;
+        Log.i(TAG, "Value of favorite for movie " + cursor.getString(INDEX_TITLE) + ": " + favoriteValue);
+        cursor.close();
     }
 }

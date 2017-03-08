@@ -5,7 +5,9 @@ The following code is the property and sole work of Mike Palarz, a student at Ud
 package com.example.android.popularmovies_stage2;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.android.popularmovies_stage2.data.MovieContract;
@@ -74,7 +76,12 @@ public class MovieFetcher {
         mTopRatedPageNumber = newPageNumber;
     }
 
+    //TODO: Time to do a pretty big change with this class and get rid of mMethodFlag. It doesn't
+    //make much sense to use this value if we are also storing the same values within SharedPreferences.
+    //Start by rewriting this method and include a context as one of the parameters. That way, you
+    //can get a reference to SharedPreferences.
     public static URL buildURL(int pageNumber){
+
         String queryMethod;
         switch (mMethodFlag){
             case 0:
@@ -182,10 +189,14 @@ public class MovieFetcher {
                     throw new UnsupportedOperationException("Unknown value for the sorted by column");
             }
 
+            movieCV.put(MovieContract.MovieTable.COLUMN_RUNTIME, 0);
+            movieCV.put(MovieContract.MovieTable.COLUMN_FAVORITE, false);
+
             movies[i] = movieCV;
 
+            //TODO: Make sure to update this later on so that the actual runtime value is included
             Movie movie = new Movie(title, ID, posterPath, overview, releaseDate, voteCount,
-                    voteAverage, backdropPath);
+                    voteAverage, backdropPath, 0, false);
 
             //These log messages are kept for possible debugging purposes
             Log.i(TAG, "\nThe current movie has been added to the array: \n");
