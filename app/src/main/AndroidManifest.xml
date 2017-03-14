@@ -4,8 +4,11 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!--The allowBackup attribute is set to false so that Android does not automatically backup-->
+    <!--the data upon reinstallations. This forces the SQLite database to be recreated.-->
+
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"

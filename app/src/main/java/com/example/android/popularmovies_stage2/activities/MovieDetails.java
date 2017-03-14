@@ -56,6 +56,8 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
     TextView mMovieOverview;
     TextView mMovieReleaseDate;
     TextView mMovieVoteResults;
+    CheckBox mFavorite;
+
     ArrayList<Movie> mMoviesList;   //Reference to movies list provided by MovieSelection
     ViewPager mViewPager;
 
@@ -97,6 +99,7 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         mMovieOverview = (TextView) findViewById(R.id.tv_movie_overview);
         mMovieReleaseDate = (TextView) findViewById(R.id.tv_movie_release_date);
         mMovieVoteResults = (TextView) findViewById(R.id.tv_movie_vote_results);
+        mFavorite = (CheckBox) findViewById(R.id.cb_favorite_star);
 
         //First, we obtain a reference to the intent received from the MovieSelection class
         Intent receivedIntent = getIntent();
@@ -254,6 +257,7 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         int voteCount = data.getInt(INDEX_VOTE_COUNT);
         float voteAverage = data.getFloat(INDEX_VOTE_AVERAGE);
         String posterPath = data.getString(INDEX_POSTER_PATH);
+        boolean favorite = data.getInt(INDEX_FAVORITE) > 0;
 
         Picasso.with(getApplicationContext())
                 .load("https://image.tmdb.org/t/p/w185/" + posterPath)
@@ -280,6 +284,7 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
             Log.e(TAG, "Location where the error occurred: " + pe.getErrorOffset());
         }
         mMovieReleaseDate.setText("Release date: " + formattedDate);
+        mFavorite.setChecked(favorite);
     }
 
     @Override

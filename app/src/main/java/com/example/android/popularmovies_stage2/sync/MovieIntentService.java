@@ -13,7 +13,20 @@ public class MovieIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        int whichTask = intent.getIntExtra(MovieSyncUtils.EXTRA_INTENT_SERVICE_SWITCH, 0);
 
-        MovieTask.syncMovies(this);
+        switch (whichTask){
+            case 0:
+                MovieTask.syncInitialMovies(this);
+                break;
+
+            case 1:
+                MovieTask.syncAdditionalMovies(this);
+                break;
+
+            default:
+                MovieTask.syncInitialMovies(this);
+                break;
+        }
     }
 }

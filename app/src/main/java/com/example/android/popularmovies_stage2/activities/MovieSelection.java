@@ -36,14 +36,6 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
     public static final String TAG = "MovieSelection";  //Tag used for debugging
 
-    //Strings which are used to uniquely identify the data that will eventually be passed onto the
-    //MovieDetails class
-    public static final String EXTRA_PARCEL = "com.example.android.popularmovies_stage2.parcel";
-    public static final String EXTRA_ID = "com.example.android.popularmovies_stage2.id";
-
-    public static final String EXTRA_METHOD_FLAG = "com.example.android.popularmovies_stage2.method_flag";
-    public static final String EXTRA_PAGE_NUMBER = "com.example.android.popularmovies_stage2.page_number";
-
     private static final int LOADER_ID_POPULARITY = 0;
     private static final int LOADER_ID_TOP_RATED = 1;
     private static final int LOADER_ID_FAVORITES = 2;
@@ -100,11 +92,10 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         MovieSyncUtils.initialize(this);
 
-        Log.i(TAG, "Value of the method flag: " + MovieFetcher.getMethodFlag());
-
         String methodFlagKey = getString(R.string.list_preference_sorting_options_key);
         int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
 
+        Log.i(TAG, "Value of the method flag: " + methodFlag);
 
         switch (methodFlag){
             case 0:
@@ -117,6 +108,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
             case 2:
                 getSupportLoaderManager().initLoader(LOADER_ID_FAVORITES, null, this);
+                break;
 
             default:
                 throw new UnsupportedOperationException("Could not recognize value of method flag within onCreate()");
