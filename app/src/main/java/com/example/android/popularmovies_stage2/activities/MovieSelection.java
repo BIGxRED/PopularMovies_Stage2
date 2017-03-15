@@ -30,6 +30,7 @@ import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.example.android.popularmovies_stage2.data.MovieDBHelper;
 import com.example.android.popularmovies_stage2.fragments.SettingsFragment;
 import com.example.android.popularmovies_stage2.sync.MovieSyncUtils;
+import com.facebook.stetho.Stetho;
 
 public class MovieSelection extends AppCompatActivity implements LoaderCallbacks<Cursor>,
         SharedPreferences.OnSharedPreferenceChangeListener {
@@ -66,6 +67,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_selection);
 
+        Stetho.initializeWithDefaults(this);
+
         //Obtain references to all of the View member variables
         mProgressBar = (ProgressBar) findViewById(R.id.pb_loading_data);
         mErrorMessageTextView = (TextView) findViewById(R.id.tv_error_loading_message);
@@ -93,9 +96,43 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         MovieSyncUtils.initialize(this);
 
         String methodFlagKey = getString(R.string.list_preference_sorting_options_key);
-        int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
+        final int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
 
-        Log.i(TAG, "Value of the method flag: " + methodFlag);
+        //Add an OnScrollListener in order to implement pagination
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy){
+                super.onScrolled(view, dx, dy);
+
+                //First we check if the user has scrolled vertically at all
+                if(dy > 0){
+
+                    //Then we check if vertically scrolling in the down direction is no longer
+                    //possible
+                    if(!mRecyclerView.canScrollVertically(1)){
+                        if (methodFlag != 2){
+                            MovieSyncUtils.startSubsequentSync(MovieSelection.this);
+
+                            switch (methodFlag){
+                                case 0:
+                                    getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY, null, MovieSelection.this);
+                                    break;
+
+                                case 1:
+                                    getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED, null, MovieSelection.this);
+                                    break;
+
+                                case 2:
+                                    throw new UnsupportedOperationException("Pagination shouldn't be occuring for favorite movies...");
+
+                                default:
+                                    throw new UnsupportedOperationException("Could not recognize value of method flag within onCreate()");
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
         switch (methodFlag){
             case 0:
@@ -290,8 +327,6 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         //Obtain the current value of the sorting options setting, which is stored as a String.
         String preferenceMethodFlagString = preferences.getString(getString(R.string.list_preference_sorting_options_key),
                getString(R.string.list_preference_sorting_options_default_value));
-
-//        int test = preferences.getInt(getString(R.string.list_preference_sorting_options_key), 0);
 
         //However, the value of the sorting options ListPreference corresponds to the method flag
         //of the MovieFetcher class. Therefore, it needs to be set accordingly by being parsed into

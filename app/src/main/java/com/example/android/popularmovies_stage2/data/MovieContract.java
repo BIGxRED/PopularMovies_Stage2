@@ -30,6 +30,10 @@ public class MovieContract {
         public static final String COLUMN_SORTED_BY = "sortedBy";
         public static final String COLUMN_RUNTIME = "runtime";
         public static final String COLUMN_FAVORITE = "favorite";
+        public static final String COLUMN_FIRST_TRAILER_KEY = "firstTrailerKey";
+        public static final String COLUMN_FIRST_TRAILER_NAME = "firstTrailerName";
+        public static final String COLUMN_SECOND_TRAILER_KEY = "secondTrailerKey";
+        public static final String COLUMN_SECOND_TRAILER_NAME = "secondTrailerName";
 
     }
 }
