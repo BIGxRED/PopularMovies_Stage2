@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/ll_first_trailer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:id="@+id/iv_first_trailer_thumbnail"
+            android:layout_width="160dp"
+            android:layout_height="80dp"
+            android:background="@color/colorAccent"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/tv_movie_trailer_title1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="N/A"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:layout_weight="2"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_second_trailer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/iv_second_trailer_thumbnail"
+            android:layout_width="160dp"
+            android:layout_height="80dp"
+            android:background="@color/colorAccent"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/tv_movie_trailer_title2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="N/A"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:layout_weight="2"/>
+
+    </LinearLayout>
+
+</LinearLayout>

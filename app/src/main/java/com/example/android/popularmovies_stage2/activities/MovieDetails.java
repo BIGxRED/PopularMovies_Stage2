@@ -28,6 +28,7 @@ import com.example.android.popularmovies_stage2.Movie;
 import com.example.android.popularmovies_stage2.R;
 import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.example.android.popularmovies_stage2.data.MovieDBHelper;
+import com.example.android.popularmovies_stage2.fragments.MovieTrailersDialogFragment;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -58,6 +59,7 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
     TextView mMovieVoteResults;
     CheckBox mFavorite;
     TextView mMovieRuntime;
+    ImageView mPlayButton;
 
     ArrayList<Movie> mMoviesList;   //Reference to movies list provided by MovieSelection
     ViewPager mViewPager;
@@ -86,6 +88,9 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
 
     private static final int DETAIL_LOADER_ID = 0;
 
+    public static final String EXTRA_URI_FOR_DIALOG =
+            "com.example.android.popularmovies_stage2.activities.moviedetails.uri";
+
     private Uri mMovieUri;
     private int mMovieID;
 
@@ -102,6 +107,18 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         mMovieVoteResults = (TextView) findViewById(R.id.tv_movie_vote_results);
         mFavorite = (CheckBox) findViewById(R.id.cb_favorite_star);
         mMovieRuntime = (TextView) findViewById(R.id.tv_movie_runtime);
+        mPlayButton = (ImageView) findViewById(R.id.iv_play_button);
+        mPlayButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                MovieTrailersDialogFragment dialogFragment = new MovieTrailersDialogFragment();
+                Bundle dialogArguments = new Bundle();
+                dialogArguments.putString(EXTRA_URI_FOR_DIALOG, mMovieUri.toString());
+                dialogFragment.setArguments(dialogArguments);
+                dialogFragment.show(getSupportFragmentManager(), null);
+            }
+        });
 
         //First, we obtain a reference to the intent received from the MovieSelection class
         Intent receivedIntent = getIntent();
