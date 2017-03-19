@@ -1,9 +1,11 @@
 package com.example.android.popularmovies_stage2;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -91,9 +93,29 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
 
             //Then an intent is created with a reference to the MovieDetails class
             Intent movieDetailsIntent = new Intent(adapterContext, MovieDetails.class);
-            int movieID = adapterCursor.getInt(MovieSelection.INDEX_MOVIE_ID);
-            Uri intentUri = MovieContract.MovieTable.CONTENT_URI.buildUpon().appendPath(Integer.toString(movieID)).build();
-            movieDetailsIntent.setData(intentUri);
+            final int movieID = adapterCursor.getInt(MovieSelection.INDEX_MOVIE_ID);
+            final Uri movieUri = MovieContract.MovieTable.CONTENT_URI.buildUpon().appendPath(Integer.toString(movieID)).build();
+
+
+            //TODO: Instead of using an ASyncTask here, considering adding an additional loader to
+            //the MovieDetails class, such as an ASyncTaskLoader
+            //Refer to the following for more information: http://stackoverflow.com/questions/15643907/multiple-loaders-in-same-activity
+            new AsyncTask<Void, Void, ContentValues>(){
+
+                @Override
+                protected ContentValues doInBackground(Void... params) {
+                    ContentValues movieDetails = MovieFetcher.fetchDetails(movieID);
+                    Log.i(TAG, "Are movieDetails null?: " + (movieDetails == null));
+                    return movieDetails;
+                }
+
+                @Override
+                protected void onPostExecute(ContentValues contentValues) {
+                    adapterContext.getContentResolver().update(movieUri, contentValues, null, null);
+                }
+            }.execute();
+
+            movieDetailsIntent.setData(movieUri);
             adapterContext.startActivity(movieDetailsIntent);
         }
     }

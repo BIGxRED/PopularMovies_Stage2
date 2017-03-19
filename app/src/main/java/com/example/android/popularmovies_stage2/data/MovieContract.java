@@ -32,8 +32,14 @@ public class MovieContract {
         public static final String COLUMN_FAVORITE = "favorite";
         public static final String COLUMN_FIRST_TRAILER_KEY = "firstTrailerKey";
         public static final String COLUMN_FIRST_TRAILER_NAME = "firstTrailerName";
+        public static final String COLUMN_FIRST_TRAILER_THUMBNAIL = "firstTrailerThumbnail";
         public static final String COLUMN_SECOND_TRAILER_KEY = "secondTrailerKey";
         public static final String COLUMN_SECOND_TRAILER_NAME = "secondTrailerName";
+        public static final String COLUMN_SECOND_TRAILER_THUMBNAIL = "secondTrailerThumbnail";
+        public static final String COLUMN_FIRST_REVIEW_LINK = "firstReviewLink";
+        public static final String COLUMN_FIRST_REVIEW_CONTENT = "firstReviewContent";
+        public static final String COLUMN_SECOND_REVIEW_LINK = "secondReviewLink";
+        public static final String COLUMN_SECOND_REVIEW_CONTENT = "secondReviewContent";
 
     }
 }

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MovieDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "movies.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
 
     public MovieDBHelper(Context context){
@@ -31,8 +31,14 @@ public class MovieDBHelper extends SQLiteOpenHelper {
             MovieContract.MovieTable.COLUMN_FAVORITE + " INTEGER NOT NULL, " +
             MovieContract.MovieTable.COLUMN_FIRST_TRAILER_KEY + " TEXT, " +
             MovieContract.MovieTable.COLUMN_FIRST_TRAILER_NAME + " TEXT, " +
+            MovieContract.MovieTable.COLUMN_FIRST_TRAILER_THUMBNAIL + " TEXT, " +
             MovieContract.MovieTable.COLUMN_SECOND_TRAILER_KEY + " TEXT, " +
-            MovieContract.MovieTable.COLUMN_SECOND_TRAILER_NAME + " TEXT" + "); ";
+            MovieContract.MovieTable.COLUMN_SECOND_TRAILER_NAME + " TEXT, " +
+            MovieContract.MovieTable.COLUMN_SECOND_TRAILER_THUMBNAIL + " TEXT, " +
+            MovieContract.MovieTable.COLUMN_FIRST_REVIEW_LINK + " TEXT, " +
+            MovieContract.MovieTable.COLUMN_FIRST_REVIEW_CONTENT + " TEXT, " +
+            MovieContract.MovieTable.COLUMN_SECOND_REVIEW_LINK + " TEXT, " +
+            MovieContract.MovieTable.COLUMN_SECOND_REVIEW_CONTENT + " TEXT" + "); ";
 
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
     }
