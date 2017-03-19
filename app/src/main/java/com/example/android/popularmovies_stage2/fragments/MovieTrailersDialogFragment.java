@@ -1,12 +1,10 @@
 package com.example.android.popularmovies_stage2.fragments;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -15,20 +13,24 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies_stage2.R;
 import com.example.android.popularmovies_stage2.activities.MovieDetails;
 import com.example.android.popularmovies_stage2.data.MovieContract;
+import com.squareup.picasso.Picasso;
 
 
 public class MovieTrailersDialogFragment extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = "MovieTrailersFragment";
 
-    TextView mTrailerTitle1;
-    TextView mTrailerTitle2;
+    TextView mTrailer1Title;
+    TextView mTrailer2Title;
+    ImageView mTrailer1Thumbnail;
+    ImageView mTrailer2Thumbnail;
+
     Uri mMovieUri;
 
     private static final int DIALOG_LOADER_ID = 1;
@@ -36,18 +38,14 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
     public static final String[] MOVIE_TRAILER_DIALOG_PROJECTION = {
             MovieContract.MovieTable.COLUMN_FIRST_TRAILER_NAME,
             MovieContract.MovieTable.COLUMN_FIRST_TRAILER_KEY,
-            MovieContract.MovieTable.COLUMN_FIRST_TRAILER_THUMBNAIL,
             MovieContract.MovieTable.COLUMN_SECOND_TRAILER_NAME,
-            MovieContract.MovieTable.COLUMN_SECOND_TRAILER_KEY,
-            MovieContract.MovieTable.COLUMN_SECOND_TRAILER_THUMBNAIL
+            MovieContract.MovieTable.COLUMN_SECOND_TRAILER_KEY
     };
 
     public static final int INDEX_FIRST_TRAILER_TITLE = 0;
     public static final int INDEX_FIRST_TRAILER_KEY = 1;
-    public static final int INDEX_FIRST_TRAILER_THUMBNAL = 2;
-    public static final int INDEX_SECOND_TRAILER_TITLE = 3;
-    public static final int INDEX_SECOND_TRAILER_KEY = 4;
-    public static final int INDEX_SECOND_TRAILER_THUMBNAIL = 5;
+    public static final int INDEX_SECOND_TRAILER_TITLE = 2;
+    public static final int INDEX_SECOND_TRAILER_KEY = 3;
 
 
     @NonNull
@@ -58,8 +56,10 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_movie_trailers, null);
-        mTrailerTitle1 = (TextView) dialogView.findViewById(R.id.tv_movie_trailer_title1);
-        mTrailerTitle2 = (TextView) dialogView.findViewById(R.id.tv_movie_trailer_title2);
+        mTrailer1Title = (TextView) dialogView.findViewById(R.id.tv_movie_trailer_title1);
+        mTrailer2Title = (TextView) dialogView.findViewById(R.id.tv_movie_trailer_title2);
+        mTrailer1Thumbnail = (ImageView) dialogView.findViewById(R.id.iv_first_trailer_thumbnail);
+        mTrailer2Thumbnail = (ImageView) dialogView.findViewById(R.id.iv_second_trailer_thumbnail);
 
         if (getArguments().containsKey(MovieDetails.EXTRA_URI_FOR_DIALOG))
             mMovieUri = Uri.parse(getArguments().getString(MovieDetails.EXTRA_URI_FOR_DIALOG));
@@ -111,9 +111,23 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
 
         String firstTrailerTitle = data.getString(INDEX_FIRST_TRAILER_TITLE);
         String secondTrailerTitle = data.getString(INDEX_SECOND_TRAILER_TITLE);
+        String firstTrailerKey = data.getString(INDEX_FIRST_TRAILER_KEY);
+        String secondTrailerKey = data.getString(INDEX_SECOND_TRAILER_KEY);
 
-        mTrailerTitle1.setText(firstTrailerTitle);
-        mTrailerTitle2.setText(secondTrailerTitle);
+        Picasso.with(getContext())
+                .load("https://img.youtube.com/vi/" + firstTrailerKey + "/default.jpg")
+                .into(mTrailer1Thumbnail);
+
+        Log.i(TAG, "First thumbnail URL: " + "https://img.youtube.com/vi/" + firstTrailerKey + "/default.jpg");
+
+        Picasso.with(getContext())
+                .load("https://img.youtube.com/vi/" + secondTrailerKey + "/default.jpg")
+                .into(mTrailer2Thumbnail);
+
+        Log.i(TAG, "Second thumbnail URL: " + "https://img.youtube.com/vi/" + secondTrailerKey + "/default.jpg");
+
+        mTrailer1Title.setText(firstTrailerTitle);
+        mTrailer2Title.setText(secondTrailerTitle);
     }
 
     @Override
