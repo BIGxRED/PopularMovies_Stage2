@@ -1,6 +1,7 @@
 package com.example.android.popularmovies_stage2.fragments;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.popularmovies_stage2.R;
@@ -30,6 +32,8 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
     TextView mTrailer2Title;
     ImageView mTrailer1Thumbnail;
     ImageView mTrailer2Thumbnail;
+    LinearLayout mTrailer1;
+    LinearLayout mTrailer2;
 
     Uri mMovieUri;
 
@@ -60,6 +64,8 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
         mTrailer2Title = (TextView) dialogView.findViewById(R.id.tv_movie_trailer_title2);
         mTrailer1Thumbnail = (ImageView) dialogView.findViewById(R.id.iv_first_trailer_thumbnail);
         mTrailer2Thumbnail = (ImageView) dialogView.findViewById(R.id.iv_second_trailer_thumbnail);
+        mTrailer1 = (LinearLayout) dialogView.findViewById(R.id.ll_first_trailer);
+        mTrailer2 = (LinearLayout) dialogView.findViewById(R.id.ll_second_trailer);
 
         if (getArguments().containsKey(MovieDetails.EXTRA_URI_FOR_DIALOG))
             mMovieUri = Uri.parse(getArguments().getString(MovieDetails.EXTRA_URI_FOR_DIALOG));
@@ -111,7 +117,9 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
 
         String firstTrailerTitle = data.getString(INDEX_FIRST_TRAILER_TITLE);
         String secondTrailerTitle = data.getString(INDEX_SECOND_TRAILER_TITLE);
-        String firstTrailerKey = data.getString(INDEX_FIRST_TRAILER_KEY);
+        final String firstTrailerKey = data.getString(INDEX_FIRST_TRAILER_KEY);
+
+        //TODO: If this value is null, make sure to disable the second trailer view
         String secondTrailerKey = data.getString(INDEX_SECOND_TRAILER_KEY);
 
         Picasso.with(getContext())
@@ -128,6 +136,20 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
 
         mTrailer1Title.setText(firstTrailerTitle);
         mTrailer2Title.setText(secondTrailerTitle);
+
+        mTrailer1.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Uri firstTrailerUri = Uri.parse("https://www.youtube.com/watch").buildUpon()
+                        .appendQueryParameter("v",firstTrailerKey)
+                        .build();
+                Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW,firstTrailerUri);
+                //TODO: Make sure to add this to the Strings XML later on
+                String chooserTitle = "Choose app to view trailer:";
+                Intent chooser = Intent.createChooser(firstTrailerIntent,chooserTitle);
+                startActivity(chooser);
+            }
+        });
     }
 
     @Override
