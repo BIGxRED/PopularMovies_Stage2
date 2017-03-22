@@ -143,7 +143,8 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
                 Uri firstTrailerUri = Uri.parse("https://www.youtube.com/watch").buildUpon()
                         .appendQueryParameter("v",firstTrailerKey)
                         .build();
-                Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW,firstTrailerUri);
+                Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW, firstTrailerUri);
+
                 //TODO: Make sure to add this to the Strings XML later on
                 String chooserTitle = "Choose app to view trailer:";
                 Intent chooser = Intent.createChooser(firstTrailerIntent,chooserTitle);
