@@ -117,40 +117,63 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
 
         String firstTrailerTitle = data.getString(INDEX_FIRST_TRAILER_TITLE);
         String secondTrailerTitle = data.getString(INDEX_SECOND_TRAILER_TITLE);
+
         final String firstTrailerKey = data.getString(INDEX_FIRST_TRAILER_KEY);
+        final String secondTrailerKey = data.getString(INDEX_SECOND_TRAILER_KEY);
 
-        //TODO: If this value is null, make sure to disable the second trailer view
-        String secondTrailerKey = data.getString(INDEX_SECOND_TRAILER_KEY);
+        if (firstTrailerTitle == null && firstTrailerKey == null){
+            mTrailer1.setVisibility(View.GONE);
+        }
 
-        Picasso.with(getContext())
-                .load("https://img.youtube.com/vi/" + firstTrailerKey + "/default.jpg")
-                .into(mTrailer1Thumbnail);
+        else{
+            Picasso.with(getContext())
+                    .load("https://img.youtube.com/vi/" + firstTrailerKey + "/default.jpg")
+                    .into(mTrailer1Thumbnail);
 
-        Log.i(TAG, "First thumbnail URL: " + "https://img.youtube.com/vi/" + firstTrailerKey + "/default.jpg");
+            mTrailer1Title.setText(firstTrailerTitle);
 
-        Picasso.with(getContext())
-                .load("https://img.youtube.com/vi/" + secondTrailerKey + "/default.jpg")
-                .into(mTrailer2Thumbnail);
+            mTrailer1.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    Uri firstTrailerUri = Uri.parse("https://www.youtube.com/watch").buildUpon()
+                            .appendQueryParameter("v",firstTrailerKey)
+                            .build();
+                    Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW, firstTrailerUri);
 
-        Log.i(TAG, "Second thumbnail URL: " + "https://img.youtube.com/vi/" + secondTrailerKey + "/default.jpg");
+                    //TODO: Make sure to add this to the Strings XML later on
+                    String chooserTitle = "Choose app to view trailer:";
+                    Intent chooser = Intent.createChooser(firstTrailerIntent,chooserTitle);
+                    startActivity(chooser);
+                }
+            });
+        }
 
-        mTrailer1Title.setText(firstTrailerTitle);
-        mTrailer2Title.setText(secondTrailerTitle);
+        if (secondTrailerTitle == null && secondTrailerKey == null){
+            mTrailer2.setVisibility(View.GONE);
+        }
 
-        mTrailer1.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Uri firstTrailerUri = Uri.parse("https://www.youtube.com/watch").buildUpon()
-                        .appendQueryParameter("v",firstTrailerKey)
-                        .build();
-                Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW, firstTrailerUri);
+        else{
+            Picasso.with(getContext())
+                    .load("https://img.youtube.com/vi/" + secondTrailerKey + "/default.jpg")
+                    .into(mTrailer2Thumbnail);
 
-                //TODO: Make sure to add this to the Strings XML later on
-                String chooserTitle = "Choose app to view trailer:";
-                Intent chooser = Intent.createChooser(firstTrailerIntent,chooserTitle);
-                startActivity(chooser);
-            }
-        });
+            mTrailer2Title.setText(secondTrailerTitle);
+
+            mTrailer2.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    Uri secondTrailerUri = Uri.parse("https://www.youtube.com/watch").buildUpon()
+                            .appendQueryParameter("v", secondTrailerKey)
+                            .build();
+                    Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW, secondTrailerUri);
+
+                    String chooserTitle = "Choose app to view trailer:";
+                    Intent chooser = Intent.createChooser(firstTrailerIntent,chooserTitle);
+                    startActivity(chooser);
+                }
+            });
+        }
+
     }
 
     @Override

@@ -60,6 +60,7 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
     CheckBox mFavorite;
     TextView mMovieRuntime;
     ImageView mPlayButton;
+    TextView mReview1;
 
     ArrayList<Movie> mMoviesList;   //Reference to movies list provided by MovieSelection
     ViewPager mViewPager;
@@ -73,7 +74,11 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
             MovieContract.MovieTable.COLUMN_VOTE_AVERAGE,
             MovieContract.MovieTable.COLUMN_POSTER_PATH,
             MovieContract.MovieTable.COLUMN_RUNTIME,
-            MovieContract.MovieTable.COLUMN_FAVORITE
+            MovieContract.MovieTable.COLUMN_FAVORITE,
+            MovieContract.MovieTable.COLUMN_FIRST_REVIEW_LINK,
+            MovieContract.MovieTable.COLUMN_FIRST_REVIEW_CONTENT,
+            MovieContract.MovieTable.COLUMN_SECOND_REVIEW_LINK,
+            MovieContract.MovieTable.COLUMN_SECOND_REVIEW_CONTENT
     };
 
     public static final int INDEX_TITLE = 0;
@@ -85,6 +90,10 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
     public static final int INDEX_POSTER_PATH = 6;
     public static final int INDEX_RUNTIME = 7;
     public static final int INDEX_FAVORITE = 8;
+    public static final int INDEX_FIRST_REVIEW_LINK = 9;
+    public static final int INDEX_FIRST_REVIEW_CONTENT = 10;
+    public static final int INDEX_SECOND_REVIEW_LINK = 11;
+    public static final int INDEX_SECOND_REVIEW_CONTENT = 12;
 
     private static final int DETAIL_LOADER_ID = 0;
 
@@ -107,6 +116,7 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         mMovieVoteResults = (TextView) findViewById(R.id.tv_movie_vote_results);
         mFavorite = (CheckBox) findViewById(R.id.cb_favorite_star);
         mMovieRuntime = (TextView) findViewById(R.id.tv_movie_runtime);
+        mReview1 = (TextView) findViewById(R.id.tv_review_1);
         mPlayButton = (ImageView) findViewById(R.id.iv_play_button);
         mPlayButton.setOnClickListener(new View.OnClickListener() {
 
@@ -278,6 +288,12 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         String posterPath = data.getString(INDEX_POSTER_PATH);
         boolean favorite = data.getInt(INDEX_FAVORITE) > 0;
         int runtime = data.getInt(INDEX_RUNTIME);
+        String firstReviewLink = data.getString(INDEX_FIRST_REVIEW_LINK);
+        String firstReviewContent = data.getString(INDEX_FIRST_REVIEW_CONTENT);
+
+        //TODO; Make sure to check if these are null at some point and hide the views if necessary
+        String secondReviewLink = data.getString(INDEX_SECOND_REVIEW_LINK);
+        String secondReviewContent = data.getString(INDEX_SECOND_REVIEW_CONTENT);
 
         Picasso.with(getApplicationContext())
                 .load("https://image.tmdb.org/t/p/w185/" + posterPath)
@@ -303,10 +319,11 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
             pe.printStackTrace();
             Log.e(TAG, "Location where the error occurred: " + pe.getErrorOffset());
         }
-        mMovieReleaseDate.setText("Release date: " + formattedDate);
+        mMovieReleaseDate.setText(formattedDate);
         mFavorite.setChecked(favorite);
 
-        mMovieRuntime.setText("Runtime: " + runtime + "m");
+        mMovieRuntime.setText(runtime + "m");
+        mReview1.setText(firstReviewContent);
     }
 
     @Override
