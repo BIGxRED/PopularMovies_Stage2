@@ -22,12 +22,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.popularmovies_stage2.Movie;
 import com.example.android.popularmovies_stage2.R;
 import com.example.android.popularmovies_stage2.data.MovieContract;
-import com.example.android.popularmovies_stage2.data.MovieDBHelper;
 import com.example.android.popularmovies_stage2.fragments.MovieTrailersDialogFragment;
 import com.squareup.picasso.Picasso;
 
@@ -60,7 +60,12 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
     CheckBox mFavorite;
     TextView mMovieRuntime;
     ImageView mPlayButton;
-    TextView mReview1;
+
+    TextView mReviewsHeading;
+    LinearLayout mFirstReview_LL;
+    TextView mFirstReview_TV;
+    LinearLayout mSecondReview_LL;
+    TextView mSecondReview_TV;
 
     ArrayList<Movie> mMoviesList;   //Reference to movies list provided by MovieSelection
     ViewPager mViewPager;
@@ -116,7 +121,13 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         mMovieVoteResults = (TextView) findViewById(R.id.tv_movie_vote_results);
         mFavorite = (CheckBox) findViewById(R.id.cb_favorite_star);
         mMovieRuntime = (TextView) findViewById(R.id.tv_movie_runtime);
-        mReview1 = (TextView) findViewById(R.id.tv_review_1);
+
+        mReviewsHeading = (TextView) findViewById(R.id.tv_reviews_heading);
+        mFirstReview_LL = (LinearLayout) findViewById(R.id.ll_review1);
+        mFirstReview_TV = (TextView) findViewById(R.id.tv_review1);
+        mSecondReview_LL = (LinearLayout) findViewById(R.id.ll_review2);
+        mSecondReview_TV = (TextView) findViewById(R.id.tv_review2);
+
         mPlayButton = (ImageView) findViewById(R.id.iv_play_button);
         mPlayButton.setOnClickListener(new View.OnClickListener() {
 
@@ -288,12 +299,12 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         String posterPath = data.getString(INDEX_POSTER_PATH);
         boolean favorite = data.getInt(INDEX_FAVORITE) > 0;
         int runtime = data.getInt(INDEX_RUNTIME);
-        String firstReviewLink = data.getString(INDEX_FIRST_REVIEW_LINK);
+
+        final String firstReviewLink = data.getString(INDEX_FIRST_REVIEW_LINK);
         String firstReviewContent = data.getString(INDEX_FIRST_REVIEW_CONTENT);
 
-        //TODO; Make sure to check if these are null at some point and hide the views if necessary
-        String secondReviewLink = data.getString(INDEX_SECOND_REVIEW_LINK);
-        String secondReviewContent = data.getString(INDEX_SECOND_REVIEW_CONTENT);
+        final String secondReviewLink = data.getString(INDEX_SECOND_REVIEW_LINK);
+        final String secondReviewContent = data.getString(INDEX_SECOND_REVIEW_CONTENT);
 
         Picasso.with(getApplicationContext())
                 .load("https://image.tmdb.org/t/p/w185/" + posterPath)
@@ -323,7 +334,39 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         mFavorite.setChecked(favorite);
 
         mMovieRuntime.setText(runtime + "m");
-        mReview1.setText(firstReviewContent);
+
+        if (firstReviewContent == null && firstReviewLink == null){
+            mReviewsHeading.setVisibility(View.GONE);
+            mFirstReview_LL.setVisibility(View.GONE);
+        }
+
+        else{
+            mFirstReview_TV.setText(firstReviewContent);
+            mFirstReview_LL.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    Uri firstReviewUri = Uri.parse(firstReviewLink);
+                    Intent firstReviewIntent = new Intent(Intent.ACTION_VIEW, firstReviewUri);
+                    startActivity(firstReviewIntent);
+                }
+            });
+        }
+
+        if (secondReviewContent == null && secondReviewLink == null){
+            mSecondReview_LL.setVisibility(View.GONE);
+        }
+
+        else{
+            mSecondReview_TV.setText(secondReviewContent);
+            mSecondReview_LL.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    Uri secondReviewUri = Uri.parse(secondReviewLink);
+                    Intent secondReviewIntent = new Intent(Intent.ACTION_VIEW, secondReviewUri);
+                    startActivity(secondReviewIntent);
+                }
+            });
+        }
     }
 
     @Override
@@ -343,19 +386,6 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         }
 
         getContentResolver().update(mMovieUri, updatedValues, null, null);
-
-        //TODO: Since this is only used for debugging, make sure to remove this once you're
-        //comfortable that this works
-        Cursor cursor = getContentResolver().query(MovieContract.MovieTable.CONTENT_URI,
-                MOVIE_DETAIL_PROJECTION,
-                MOVIE_DETAIL_PROJECTION[INDEX_MOVIE_ID] + " = ?",
-                new String[] {Integer.toString(mMovieID)},
-                null);
-
-        cursor.moveToFirst();
-        boolean favoriteValue = cursor.getInt(INDEX_FAVORITE) > 0;
-        Log.i(TAG, "Value of favorite for movie " + cursor.getString(INDEX_TITLE) + ": " + favoriteValue);
-        cursor.close();
     }
 
 }

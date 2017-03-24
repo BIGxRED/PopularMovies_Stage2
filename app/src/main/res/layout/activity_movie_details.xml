@@ -36,7 +36,8 @@
             app:layout_constraintRight_toRightOf="@+id/title_background"
             app:layout_constraintTop_toTopOf="@+id/title_background"
             android:layout_marginTop="8dp"
-            android:onClick="onFavoriteClicked"/>
+            android:onClick="onFavoriteClicked"
+            android:layout_marginEnd="8dp"/>
 
         <!--Movie title-->
         <TextView
@@ -89,7 +90,6 @@
             android:layout_width="0dp"
             android:layout_marginLeft="8dp"
             android:layout_marginBottom="24dp"
-            tools:layout_constraintTop_creator="1"
             app:layout_constraintLeft_toRightOf="@+id/fl_movie_poster"
             app:layout_constraintBottom_toTopOf="@+id/tv_movie_release_date"
             android:layout_marginStart="8dp"/>
@@ -103,7 +103,6 @@
             android:layout_width="0dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            tools:layout_constraintTop_creator="1"
             app:layout_constraintLeft_toRightOf="@+id/tv_movie_runtime_label"
             app:layout_constraintBottom_toBottomOf="@+id/tv_movie_runtime_label"/>
 
@@ -127,7 +126,6 @@
             style="@style/MovieStats"
             android:layout_height="40dp"
             android:layout_width="120dp"
-            android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/fl_movie_poster"
             app:layout_constraintTop_toBottomOf="@+id/title_background"
@@ -158,11 +156,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="N/A"
-            tools:layout_constraintTop_creator="1"
             app:layout_constraintLeft_toRightOf="@+id/tv_movie_vote_results_label"
             android:layout_marginLeft="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/tv_movie_vote_results_label"
-            android:layout_marginTop="8dp"/>
+            />
 
         <!--Horizontal separator-->
         <View
@@ -219,28 +216,95 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/separator2"/>
 
-        <!--Review 1 heading-->
-        <TextView
-            android:id="@+id/tv_review1_heading"
+        <LinearLayout
+            android:id="@+id/ll_review1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Review 1"
-            style="@style/MovieStats"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@+id/tv_reviews_heading"
-            android:gravity="left"/>
-
-        <TextView
-            android:id="@+id/tv_review_1"
-            android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:maxLines="4"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_review1_heading"/>
+            app:layout_constraintRight_toRightOf="parent">
+
+            <!--Review 1 heading-->
+            <TextView
+                android:id="@+id/tv_review1_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Review 1"
+                style="@style/MovieStats"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_reviews_heading"
+                android:gravity="left"/>
+
+            <TextView
+                android:id="@+id/tv_review1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="4"
+                android:ellipsize="end"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_review1_heading"/>
+
+            <TextView
+                android:id="@+id/tv_review1_click_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="CLICK TO VIEW MORE"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_review1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_review2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/ll_review1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+
+            <!--Review 1 heading-->
+            <TextView
+                android:id="@+id/tv_review2_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Review 2"
+                style="@style/MovieStats"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_review1_click_hint"
+                android:gravity="left"/>
+
+            <TextView
+                android:id="@+id/tv_review2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="4"
+                android:ellipsize="end"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_review2_heading"/>
+
+            <TextView
+                android:id="@+id/tv_review2_click_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="CLICK TO VIEW MORE"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_review2"/>
+
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
