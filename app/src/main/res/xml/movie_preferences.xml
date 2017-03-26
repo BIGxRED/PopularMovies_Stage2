@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--The following code is the property and sole work of Mike Palarz, a student at Udacity-->
+
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--Configuration of the method flag ListPreference-->
     <ListPreference
         android:defaultValue="@string/list_preference_sorting_options_default_value"
         android:title="@string/list_preference_sorting_options_title"

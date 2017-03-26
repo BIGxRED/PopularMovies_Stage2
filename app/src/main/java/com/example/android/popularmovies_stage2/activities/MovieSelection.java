@@ -103,6 +103,9 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         //Setup the page number to be used in case the user scrolls to the bottom of the RecyclerView
         setupPageNumber();
 
+        //Setup SharedPreferences, largely to register the OnSharedPreferenceChangeListener
+        setupSharedPreferences();
+
         //Initialize the DB if necessary
         MovieSyncUtils.initialize(this);
 

@@ -8,9 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /*
-This class was created in order to store all of the data obtained through TheMovieDB API. This class
- implements the parcelable interface so that it can be easily passed on to the MovieDetails class
- through an intent within MovieSelection.
+This class is deprecated for Stage 2. However, it is here for the sake of completeness.
  */
 
 public class Movie implements Parcelable {

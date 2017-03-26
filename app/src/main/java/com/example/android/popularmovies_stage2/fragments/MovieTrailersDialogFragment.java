@@ -188,6 +188,7 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
             });
         }
 
+        //Likewise for the second trailer
         if (secondTrailerTitle == null && secondTrailerKey == null){
             mTrailer2.setVisibility(View.GONE);
         }

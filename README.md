@@ -1,4 +1,4 @@
-# PopularMovies_Stage1
+# PopularMovies_Stage2
 
 The purposes of this app is to pull data from TheMovieDB API and display a grid array of movie posters to the user.
 

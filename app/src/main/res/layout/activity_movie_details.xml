@@ -13,6 +13,7 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent">
 
+        <!--Background view to add some polish to the movie tital-->
         <View
             android:id="@+id/title_background"
             android:layout_width="0dp"
@@ -26,6 +27,7 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintVertical_bias="0.0"/>
 
+        <!--CheckBox, which is used as the favorite button; this has been adjusted to display a star-->
         <CheckBox
             android:id="@+id/cb_favorite_star"
             android:buttonTint="@color/colorAccent"
@@ -52,6 +54,7 @@
             app:layout_constraintTop_toTopOf="@+id/title_background"
             app:layout_constraintBottom_toBottomOf="@+id/title_background"/>
 
+        <!--Contains both the movie poster and the play button which overlays on top of it-->
         <FrameLayout
             android:id="@+id/fl_movie_poster"
             android:layout_width="160dp"
@@ -77,13 +80,12 @@
                 android:layout_gravity="center"
                 android:alpha="0.5"/>
 
-
         </FrameLayout>
 
         <!--Runtime label-->
         <TextView
             android:id="@+id/tv_movie_runtime_label"
-            android:text="Runtime:"
+            android:text="@string/movie_details_header_runtime"
             style="@style/MovieStats"
             android:textStyle="bold"
             android:layout_height="wrap_content"
@@ -109,7 +111,7 @@
         <!--Release date label-->
         <TextView
             android:id="@+id/tv_movie_release_date_label"
-            android:text="Release date:"
+            android:text="@string/movie_details_header_release_date"
             style="@style/MovieStats"
             android:textStyle="bold"
             android:layout_height="wrap_content"
@@ -136,7 +138,7 @@
         <!--Vote label-->
         <TextView
             android:id="@+id/tv_movie_vote_results_label"
-            android:text="Votes:"
+            android:text="@string/movie_details_header_vote"
             style="@style/MovieStats"
             android:textStyle="bold"
             android:layout_height="wrap_content"
@@ -177,7 +179,7 @@
             android:id="@+id/tv_overview_heading"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/movie_overview_header"
+            android:text="@string/movie_details_header_overview"
             style="@style/MovieHeader"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -195,6 +197,7 @@
             tools:layout_constraintLeft_creator="1"
             app:layout_constraintLeft_toLeftOf="@+id/tv_overview_heading"/>
 
+        <!--Horizontal separator-->
         <View
             android:id="@+id/separator2"
             style="@style/HorizontalDivider"
@@ -210,12 +213,14 @@
             android:id="@+id/tv_reviews_heading"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Reviews"
+            android:text="@string/movie_details_header_reviews"
             style="@style/MovieHeader"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/separator2"/>
 
+        <!--A LinearLayout is used for both reviews to make them easier to click on-->
+        <!--Clicking on either review launches an implicit intent to see the full review-->
         <LinearLayout
             android:id="@+id/ll_review1"
             android:layout_width="0dp"
@@ -230,7 +235,7 @@
                 android:id="@+id/tv_review1_heading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Review 1"
+                android:text="@string/movie_details_header_review1"
                 style="@style/MovieStats"
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"
@@ -239,6 +244,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_reviews_heading"
                 android:gravity="left"/>
 
+            <!--The a preview of the first review-->
             <TextView
                 android:id="@+id/tv_review1"
                 android:layout_width="wrap_content"
@@ -249,18 +255,20 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_review1_heading"/>
 
+            <!--A hint for the user to view the full review-->
             <TextView
                 android:id="@+id/tv_review1_click_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="CLICK TO VIEW MORE"
+                android:text="@string/movie_details_header_review_read_more"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_review1"/>
 
         </LinearLayout>
 
+        <!--A LinearLayout for the second review-->
         <LinearLayout
             android:id="@+id/ll_review2"
             android:layout_width="0dp"
@@ -270,12 +278,12 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent">
 
-            <!--Review 1 heading-->
+            <!--Review 2 heading-->
             <TextView
                 android:id="@+id/tv_review2_heading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Review 2"
+                android:text="@string/movie_details_header_review2"
                 style="@style/MovieStats"
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"
@@ -284,6 +292,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_review1_click_hint"
                 android:gravity="left"/>
 
+            <!--The a preview of the second review-->
             <TextView
                 android:id="@+id/tv_review2"
                 android:layout_width="wrap_content"
@@ -294,12 +303,13 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_review2_heading"/>
 
+            <!--A hint for the user to view the full review-->
             <TextView
                 android:id="@+id/tv_review2_click_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="CLICK TO VIEW MORE"
+                android:text="@string/movie_details_header_review_read_more"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_review2"/>

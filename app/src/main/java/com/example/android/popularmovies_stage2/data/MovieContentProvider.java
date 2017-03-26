@@ -1,3 +1,7 @@
+/*
+The following code is the property and sole work of Mike Palarz, a student at Udacity
+ */
+
 package com.example.android.popularmovies_stage2.data;
 
 import android.content.ContentProvider;
@@ -12,15 +16,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+/*
+A ContentProvider implementation responsible for providing data from the SQLite database.
+ */
 public class MovieContentProvider extends ContentProvider {
 
+    //Integer values used for the UriMatcher
     public static final int MOVIES = 100;
     public static final int MOVIE_WITH_ID = 101;
 
-    public static final String TAG = "MovieContentProvider";
+    public static final String TAG = "MovieContentProvider";    //Tag used for debugging
 
-    private MovieDBHelper mDBHelper;
+    private MovieDBHelper mDBHelper;    //DB Helper used for accessing the DB itself
 
+    //UriMatcher responsible for matching up a Uri to all of the possible Uri's of the DB
     public static final UriMatcher sMatcher = buildUriMatcher();
 
     @Override

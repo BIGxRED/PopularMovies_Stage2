@@ -22,6 +22,10 @@ import com.example.android.popularmovies_stage2.activities.MovieSelection;
 import com.example.android.popularmovies_stage2.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
+/*
+This class is responsible for staying in sync with the data that is stored within the SQLite DB and
+displaying within the RecyclerView.
+ */
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder> {
 
     private static final String TAG = "MovieAdapter";   //Tag used for debugging

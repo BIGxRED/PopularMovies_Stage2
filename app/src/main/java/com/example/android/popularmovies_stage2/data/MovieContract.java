@@ -1,3 +1,7 @@
+/*
+The following code is the property and sole work of Mike Palarz, a student at Udacity
+ */
+
 package com.example.android.popularmovies_stage2.data;
 
 import android.net.Uri;

@@ -1,3 +1,5 @@
+<!--The following code is the property and sole work of Mike Palarz, a student at Udacity-->
+
 <resources>
     <string name="app_name">Popular Movies</string>
 
@@ -11,7 +13,14 @@
         connection.</string>
 
     <!--Strings for the MovieDetails activity-->
-    <string name="movie_overview_header">Overview</string>
+    <string name="movie_details_header_overview">Overview</string>
+    <string name="movie_details_header_runtime">Runtime:</string>
+    <string name="movie_details_header_release_date">"Release date:</string>
+    <string name="movie_details_header_vote">Votes:</string>
+    <string name="movie_details_header_reviews">Reviews</string>
+    <string name="movie_details_header_review1">Review 1</string>
+    <string name="movie_details_header_review2">Review 2</string>
+    <string name="movie_details_header_review_read_more">CLICK TO VIEW MORE</string>
 
     <!--Strings used for the action bar menu-->
     <string name="main_menu_sort_by_options">Sort movies by:</string>
@@ -19,8 +28,6 @@
     <string name="main_menu_settings_button">Settings</string>
     <string name="popup_menu_popularity_button">Popularity</string>
     <string name="popup_menu_top_rated_button">Top Rated</string>
-
-    <!--SHARED PREFERENCES STRINGS-->
 
     <!--Strings used for the ListPreference that allows the user to select their sorting option-->
     <string name="list_preference_sorting_options_default_value">0</string>

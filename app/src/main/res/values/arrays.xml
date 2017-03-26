@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--The following code is the property and sole work of Mike Palarz, a student at Udacity-->
+
 <resources>
 
+    <!--Actual Strings that will be shown within the ListPreference-->
     <array name="list_preference_sorting_options_entries">
         <item>@string/list_preference_sorting_options_entry_popularity</item>
         <item>@string/list_preference_sorting_options_entry_top_rated</item>
         <item>@string/list_preference_sorting_options_entry_favorites</item>
     </array>
 
+    <!--The values that are associated to each of the entries-->
     <array name="list_preference_sorting_options_entry_values">
         <item>@string/list_preference_sorting_options_entry_value_popularity</item>
         <item>@string/list_preference_sorting_options_entry_value_top_rated</item>

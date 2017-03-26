@@ -1,9 +1,17 @@
+/*
+The following code is the property and sole work of Mike Palarz, a student at Udacity
+ */
+
 package com.example.android.popularmovies_stage2.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/*
+An implementation of a SQLiteOpenHelper, which is responsible for creating and updating the
+SQLIte database.
+ */
 public class MovieDBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "movies.db";
@@ -14,6 +22,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    //Creates the database according to the values within MovieContract
     @Override
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MovieContract.MovieTable.TABLE_NAME + " (" +
@@ -41,6 +50,8 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_MOVIES_TABLE);
     }
 
+    //As of now, this method simply deletes the old DB if it was previously created and then
+    //recreates the DB
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieTable.TABLE_NAME);
