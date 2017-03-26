@@ -30,9 +30,6 @@ public class MovieTask {
     synchronized public static void syncAdditionalMovies(Context context){
         ContentValues[] newMovies = MovieFetcher.fetchMovies(context);
 
-        Log.i(TAG, "Current value of sorting option: " + SettingsFragment.getPreferenceValue(context,
-                context.getString(R.string.list_preference_sorting_options_key)));
-
         ContentResolver resolver = context.getContentResolver();
 
         if (newMovies != null && newMovies.length > 0){

@@ -19,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -32,11 +33,18 @@ import com.example.android.popularmovies_stage2.fragments.SettingsFragment;
 import com.example.android.popularmovies_stage2.sync.MovieSyncUtils;
 import com.facebook.stetho.Stetho;
 
+
+/*
+This class is responsible for displaying a grid of movie posters which the user can sort by either
+popularity, top rated, or their own personal favorites. When the user clicks on any of the posters,
+they are shown a details screen which contains additional information about the movie.
+ */
 public class MovieSelection extends AppCompatActivity implements LoaderCallbacks<Cursor>,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String TAG = "MovieSelection";  //Tag used for debugging
 
+    //IDs used for cursor loaders in order to uniquely identify them
     private static final int LOADER_ID_POPULARITY = 0;
     private static final int LOADER_ID_TOP_RATED = 1;
     private static final int LOADER_ID_FAVORITES = 2;
@@ -44,11 +52,13 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     RecyclerView mRecyclerView; //Reference to the RecyclerView
     MovieAdapter mAdapter;  //MovieAdapter that will be set to mRecyclerView
 
+    //Reference to the SQlite database
     private SQLiteDatabase mDatabase;
 
-    ProgressBar mProgressBar;   //ProgressBar which is used to show that data is being loaded
     TextView mErrorMessageTextView; //TextView which is shown in case data could not be retrieved
 
+
+    //A helper array that is used whenever Cursors are involved
     public static final String[] MOVIE_SELECTION_PROJECTION = {
         MovieContract.MovieTable.COLUMN_MOVIE_ID,
         MovieContract.MovieTable.COLUMN_POSTER_PATH,
@@ -56,6 +66,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         MovieContract.MovieTable.COLUMN_FAVORITE
     };
 
+    //References to the Strings within MOVIE_SELECTION_PROJECTION
     public static final int INDEX_MOVIE_ID = 0;
     public static final int INDEX_POSTER_PATH = 1;
     public static final int INDEX_SORTED_BY = 2;
@@ -70,31 +81,34 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         Stetho.initializeWithDefaults(this);
 
         //Obtain references to all of the View member variables
-        mProgressBar = (ProgressBar) findViewById(R.id.pb_loading_data);
         mErrorMessageTextView = (TextView) findViewById(R.id.tv_error_loading_message);
-
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_selection);
 
         //The LayoutManager is set to being a GridLayoutManager, with a span count of 3
         GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
         mRecyclerView.setLayoutManager(layoutManager);
 
+        //This setting is used because all of the elements within the RecyclerView will be the same
+        //size; this makes the RecyclerView operate more efficiently
         mRecyclerView.setHasFixedSize(true);
 
         //Initializing the SQLite database
         MovieDBHelper dbHelper = new MovieDBHelper(this);
         mDatabase = dbHelper.getWritableDatabase();
 
-
         //Create and set the adapter accordingly
         mAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
-        setupSharedPreferences();
+        //Setup the page number to be used in case the user scrolls to the bottom of the RecyclerView
         setupPageNumber();
 
+        //Initialize the DB if necessary
         MovieSyncUtils.initialize(this);
 
+        /*Obtain a reference to the method flag, which indicates which sorting method should be used -
+        either popular, top rated, or favorites
+         */
         String methodFlagKey = getString(R.string.list_preference_sorting_options_key);
         final int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
 
@@ -108,7 +122,8 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
                 if(dy > 0){
 
                     //Then we check if vertically scrolling in the down direction is no longer
-                    //possible
+                    //possible and load the next set of data based on the current value of the page
+                    //number
                     if(!mRecyclerView.canScrollVertically(1)){
                         if (methodFlag != 2){
                             MovieSyncUtils.startSubsequentSync(MovieSelection.this);
@@ -134,6 +149,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
             }
         });
 
+        //Finally, we initialize the loader
         switch (methodFlag){
             case 0:
                 getSupportLoaderManager().initLoader(LOADER_ID_POPULARITY, null, this);
@@ -160,7 +176,6 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         String methodFlagKey = getString(R.string.list_preference_sorting_options_key);
         int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
-        Log.i(TAG, "Value of methodFlag within onResume(): " + methodFlag);
 
         switch (methodFlag){
             case 0:
@@ -185,7 +200,11 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        //Make sure to close the DB to prevent any memory leaks
         mDatabase.close();
+
+        //We also unregister the SharedPreferenceChangeListener
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
@@ -206,25 +225,33 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         switch(item.getItemId()){
 
             case R.id.settings:
+                //If the 'Settings' button is clicked, SettingsActivity is launched
                 Intent launchSettingsActivity = new Intent(this, SettingsActivity.class);
                 startActivity(launchSettingsActivity);
                 return true;
 
-            //Simply fetches the movie data again, starting from the first page
             case R.id.refresh:
+                //If the 'Refresh' is clicked, then the appropriate loader is restarted
 
-                switch (MovieFetcher.getMethodFlag()){
+                String methodFlagKey = getString(R.string.list_preference_sorting_options_key);
+                final int methodFlag = SettingsFragment.getPreferenceValue(this, methodFlagKey);
+
+                switch (methodFlag){
                     case 0:
-                        getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY,null,this);
+                        getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY, null, this);
                         break;
                     case 1:
-                        getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED,null,this);
+                        getSupportLoaderManager().restartLoader(LOADER_ID_TOP_RATED, null, this);
+                        break;
+                    case 2:
+                        getSupportLoaderManager().restartLoader(LOADER_ID_FAVORITES, null, this);
                         break;
                     default:
                         throw new UnsupportedOperationException("Could not recognize value of method flag within onResume()");
                 }
 
                 return true;
+
             default:
                 super.onOptionsItemSelected(item);
                 return true;
@@ -244,6 +271,7 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         String selection;
         String[] selectionArgs;
 
+        //The appropriate loader is created based on it's ID
         switch (id){
             case LOADER_ID_POPULARITY:
                 selection = MOVIE_SELECTION_PROJECTION[INDEX_SORTED_BY] + " = ?";
@@ -290,11 +318,17 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
 
-        Log.i(TAG, "Number of items within Cursor in onLoadFinished(): " + data.getCount());
+        //If the data is empy, then it's very likely that the user should be shown the error message
+        if (data == null){
+            mErrorMessageTextView.setVisibility(View.VISIBLE);
+        }
+        else{
+            mErrorMessageTextView.setVisibility(View.INVISIBLE);
+        }
     }
 
     /*
-    This method is called whenever a Loader is being reset, which inherently makes it data unavailable.
+    This method is called whenever a Loader is being reset, which inherently makes its data unavailable.
     Due to the data being unavailable, any references to that data should be removed. In the of this
     application, we don't have a need for this method but it must be implemented in order to
     use the LoaderCallbacks interface.
@@ -304,8 +338,10 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         mAdapter.swapCursor(null);
     }
 
-
-    //TODO: Maybe call super() in here if you're not using it
+    /*
+    * At first had a need for this method, but no longer needed in final implementation. It is
+    * kept for the sake of completeness
+    */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -320,19 +356,23 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         //Get a reference to the SharedPreferences DB
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        //TODO: See if there's a cleaner way of doing this. Maybe get a reference to an individual
-        //preference (in this case, the sorting options preference) and then use findIndexOfValue().
-        //Also consider this: https://developer.android.com/training/basics/network-ops/xml.html
-
         //Obtain the current value of the sorting options setting, which is stored as a String.
         String preferenceMethodFlagString = preferences.getString(getString(R.string.list_preference_sorting_options_key),
                getString(R.string.list_preference_sorting_options_default_value));
 
-        //However, the value of the sorting options ListPreference corresponds to the method flag
-        //of the MovieFetcher class. Therefore, it needs to be set accordingly by being parsed into
-        //an int.
+        /*
+        However, the value of the sorting options ListPreference corresponds to the ID of the
+        current loader that is being used. Therefore, it needs to be set accordingly by being parsed
+        into an int.
+        */
+
+        /*
+        This used to be passed to setMethodFlag() from the MovieFetcher class. However, the app
+        was later on redesigned so that the method flag is always pulled from the SharedPreferences
+        database. Therefore, this line is kept for the sake of completeness, even though
+        preferenceMethodFlag is never used.
+        */
         int preferenceMethodFlag = Integer.parseInt(preferenceMethodFlagString);
-        MovieFetcher.setMethodFlag(preferenceMethodFlag);
 
         //Finally, we register this class as our OnSharedPreferenceChangeListener
         preferences.registerOnSharedPreferenceChangeListener(this);
@@ -352,10 +392,10 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
             //Then we obtain the value of the ListPreference and parse it into an int
             String methodFlagString = sharedPreferences
                     .getString(key, getString(R.string.list_preference_sorting_options_default_value));
-            MovieFetcher.setMethodFlag(Integer.parseInt(methodFlagString));
+            int methodFlag = Integer.parseInt(methodFlagString);
 
             //Finally, we relaunch the CursorLoader
-            switch (MovieFetcher.getMethodFlag()){
+            switch (methodFlag){
                 case 0:
                     getSupportLoaderManager().restartLoader(LOADER_ID_POPULARITY, null, this);
                     break;
@@ -374,8 +414,6 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
 
         }
 
-        //TODO: Maybe one additional setting would be to allow the user to clear out all of their
-        //current favorited movies? Just a thought.
     }
 
     /*

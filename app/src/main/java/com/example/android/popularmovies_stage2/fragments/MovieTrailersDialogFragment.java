@@ -1,3 +1,7 @@
+/*
+The following code is the property and sole work of Mike Palarz, a student at Udacity
+ */
+
 package com.example.android.popularmovies_stage2.fragments;
 
 import android.app.Dialog;
@@ -26,19 +30,27 @@ import com.squareup.picasso.Picasso;
 
 public class MovieTrailersDialogFragment extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = "MovieTrailersFragment";
+    private static final String TAG = "MovieTrailersFragment";  //Tag used for debugging
 
+    //TextViews which show the title of the trailer
     TextView mTrailer1Title;
     TextView mTrailer2Title;
+
+    //ImageViews which display a thumbnail of the trailer, obtained via a Youtube network call
     ImageView mTrailer1Thumbnail;
     ImageView mTrailer2Thumbnail;
     LinearLayout mTrailer1;
     LinearLayout mTrailer2;
 
+    //Uri used to obtain the trailer data
     Uri mMovieUri;
 
+    /*
+    ID for loader which obtains the trailer data from the SQLIte DB
+     */
     private static final int DIALOG_LOADER_ID = 1;
 
+    //Array which is used to simplify queries into the DB
     public static final String[] MOVIE_TRAILER_DIALOG_PROJECTION = {
             MovieContract.MovieTable.COLUMN_FIRST_TRAILER_NAME,
             MovieContract.MovieTable.COLUMN_FIRST_TRAILER_KEY,
@@ -46,6 +58,7 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
             MovieContract.MovieTable.COLUMN_SECOND_TRAILER_KEY
     };
 
+    //Integer values that refer to the Strings within MOVIE_TRAILER_DIALOG_PROJECTION
     public static final int INDEX_FIRST_TRAILER_TITLE = 0;
     public static final int INDEX_FIRST_TRAILER_KEY = 1;
     public static final int INDEX_SECOND_TRAILER_TITLE = 2;
@@ -54,12 +67,23 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
 
     @NonNull
     @Override
+    /*
+    This method is overriden in order to create our own, custom Dialog. In addition, because we are
+    creating an AlertDialog, we only need to override onCreateDialog(). It is not necessary to
+    override onCreateView because AlertDialog takes care of that for us.
+     */
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateDialog() is called");
 
+        //First we instantiate a builder
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        //...and obtain a LayoutInflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        //We inflate that layout that's been created for the dialog
         View dialogView = inflater.inflate(R.layout.dialog_movie_trailers, null);
+
+        //And instatiate all of the views within the layout
         mTrailer1Title = (TextView) dialogView.findViewById(R.id.tv_movie_trailer_title1);
         mTrailer2Title = (TextView) dialogView.findViewById(R.id.tv_movie_trailer_title2);
         mTrailer1Thumbnail = (ImageView) dialogView.findViewById(R.id.iv_first_trailer_thumbnail);
@@ -67,18 +91,22 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
         mTrailer1 = (LinearLayout) dialogView.findViewById(R.id.ll_first_trailer);
         mTrailer2 = (LinearLayout) dialogView.findViewById(R.id.ll_second_trailer);
 
+        //We then obtain the Uri that was passed into the bundle
         if (getArguments().containsKey(MovieDetails.EXTRA_URI_FOR_DIALOG))
             mMovieUri = Uri.parse(getArguments().getString(MovieDetails.EXTRA_URI_FOR_DIALOG));
 
+        //Loader is launched to obtain the necessary data
         LoaderManager loaderManager = getActivity().getSupportLoaderManager();
         loaderManager.initLoader(DIALOG_LOADER_ID, null, this);
 
-        builder.setView(dialogView)
+        //The AlertDialog is then constructed using the builder object that was instantiated earlier
+        return builder.setView(dialogView)
                 .setTitle(R.string.alert_dialog_title)
-                .setNegativeButton(R.string.alert_dialog_cancel_button_text,null);
-        return builder.create();
+                .setNegativeButton(R.string.alert_dialog_cancel_button_text,null)
+                .create();
     }
 
+    //We create a Loader which obtains the data that applies to the movie trailers
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id){
@@ -115,16 +143,20 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
             return;
         }
 
+        //The data for the trailers is extracted from the Cursor
         String firstTrailerTitle = data.getString(INDEX_FIRST_TRAILER_TITLE);
         String secondTrailerTitle = data.getString(INDEX_SECOND_TRAILER_TITLE);
 
         final String firstTrailerKey = data.getString(INDEX_FIRST_TRAILER_KEY);
         final String secondTrailerKey = data.getString(INDEX_SECOND_TRAILER_KEY);
 
+        //We make sure to remove the views that pertain to each of the trailers if there was no
+        //data available for the given trailer
         if (firstTrailerTitle == null && firstTrailerKey == null){
             mTrailer1.setVisibility(View.GONE);
         }
 
+        //If data is available, then the views are populated accordingly
         else{
             Picasso.with(getContext())
                     .load("https://img.youtube.com/vi/" + firstTrailerKey + "/default.jpg")
@@ -132,17 +164,25 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
 
             mTrailer1Title.setText(firstTrailerTitle);
 
+            //An on-click listener is created so that the trailer is launched when the user
+            //clicks on the LinearLayout
             mTrailer1.setOnClickListener(new View.OnClickListener(){
+
                 @Override
                 public void onClick(View v) {
+
+                    //A Uri is constructed using the key obtained from TMDB
                     Uri firstTrailerUri = Uri.parse("https://www.youtube.com/watch").buildUpon()
                             .appendQueryParameter("v",firstTrailerKey)
                             .build();
+
+                    //An implicit intent is then created
                     Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW, firstTrailerUri);
 
-                    //TODO: Make sure to add this to the Strings XML later on
-                    String chooserTitle = "Choose app to view trailer:";
-                    Intent chooser = Intent.createChooser(firstTrailerIntent,chooserTitle);
+                    //We allow the user to choose which app they'd like to view the trailer in
+                    //by creating a chooser intent
+                    String chooserTitle = getString(R.string.alert_dialog_chooser_title);
+                    Intent chooser = Intent.createChooser(firstTrailerIntent, chooserTitle);
                     startActivity(chooser);
                 }
             });
@@ -167,7 +207,7 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
                             .build();
                     Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW, secondTrailerUri);
 
-                    String chooserTitle = "Choose app to view trailer:";
+                    String chooserTitle = getString(R.string.alert_dialog_chooser_title);
                     Intent chooser = Intent.createChooser(firstTrailerIntent,chooserTitle);
                     startActivity(chooser);
                 }
@@ -178,6 +218,6 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //Nothing to do here just yet
+        //Nothing to do here
     }
 }

@@ -1,3 +1,7 @@
+/*
+The following code is the property and sole work of Mike Palarz, a student at Udacity
+ */
+
 package com.example.android.popularmovies_stage2.fragments;
 
 import android.content.ContentResolver;
@@ -54,8 +58,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
             Preference preference = screen.getPreference(i);
             if (preference != null){
                 if (!(preference instanceof CheckBoxPreference)){
-                    String value = sharedPreferences.getString(preference.getKey(),"");
-                    setPreferenceSummary(preference, value);
+                    setPreferenceSummary(preference);
                 }
             }
         }
@@ -66,18 +69,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
     if it is a ListPreference will suffice for now because that's the only preference type that we
     are using, but it may be necessary to expand this method if more preferences are added.
      */
-
-    //TODO: I don't think there's much of a purpose to include the value String in this method since
-    //getEntry() appears to work instead of getEntries(). Therefore, consider removing the value
-    //parameter.
-    private void setPreferenceSummary(Preference preference, String value){
+    private void setPreferenceSummary(Preference preference){
         if (preference instanceof ListPreference){
             ListPreference listPreference = (ListPreference) preference;
             listPreference.setSummary(listPreference.getEntry());
-//            int preferenceIndex = listPreference.findIndexOfValue(value);
-//            if (preferenceIndex >= 0){
-//                listPreference.setSummary(listPreference.getEntries()[preferenceIndex]);
-//            }
         }
     }
 
@@ -90,20 +85,30 @@ public class SettingsFragment extends PreferenceFragmentCompat
         Preference preference = findPreference(key);
         if (preference != null){
             if (!(preference instanceof CheckBoxPreference)){
-                String value = sharedPreferences.getString(preference.getKey(),"");
-                setPreferenceSummary(preference, value);
+                setPreferenceSummary(preference);
             }
         }
     }
 
+    /*
+    This is a helper method which obtains the method flag for us. It is especially useful within
+    several classes (MovieSelection, MovieFetcher, etc.).  Because only one preference is available
+    within the app at this time, this method only applies to that single preference. However, it
+    has been structured such that it could be easily adjusted in case additional preferences would
+    be added in the future.
+     */
     public static int getPreferenceValue(Context context, String key){
+        //Obtain a reference to the default SharedPreferences DB
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
+        //We then check if the key that was passed is the same as the key for the list preference
         if (key == context.getString(R.string.list_preference_sorting_options_key)){
             String sortingOptionsValueString = preferences.getString(key,
                     context.getString(R.string.list_preference_sorting_options_default_value));
 
             int sortingOptionsValue = Integer.parseInt(sortingOptionsValueString);
+
+            //If the correct key was passed, then the appropriate method flag is returned
             return sortingOptionsValue;
         }
         else {

@@ -1,3 +1,7 @@
+/*
+The following code is the property and sole work of Mike Palarz, a student at Udacity
+ */
+
 package com.example.android.popularmovies_stage2;
 
 import android.content.ContentValues;
@@ -8,7 +12,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +24,12 @@ import com.squareup.picasso.Picasso;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder> {
 
-    private static final String TAG = "MovieAdapter";
+    private static final String TAG = "MovieAdapter";   //Tag used for debugging
 
+    //Context which is used to obtain references to the ContentResolver among other things
     private final Context adapterContext;
+
+    //Cursor which is used to obtain the data within the SQLite DB
     private Cursor adapterCursor;
 
     //Default constructor of the adapter
@@ -40,7 +46,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
         return new MovieHolder(view);
     }
 
-    //This method "binds" the data that is contained within adapterMovies to the different
+    //This method "binds" the data that is contained within SQLIte DB to the different
     //views contained in the MovieHolder. In this case, since only an ImageView is contained
     //within the layout, the poster path is obtained for the corresponding movie and the image
     //is loaded via Picasso.
@@ -65,6 +71,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
         return adapterCursor.getCount();
     }
 
+    //Used to "swap" in the data once the Loader within MovieSelection has finished obtaining the data
+    //This is called within onLoadFinished()
     public void swapCursor(Cursor newData){
         adapterCursor = newData;
         notifyDataSetChanged();
@@ -93,19 +101,22 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
 
             //Then an intent is created with a reference to the MovieDetails class
             Intent movieDetailsIntent = new Intent(adapterContext, MovieDetails.class);
+
+            //We obtain the movie ID from adapterCursor so that the appropriate data may be obtained
+            //once the MovieDetails activity is launched
             final int movieID = adapterCursor.getInt(MovieSelection.INDEX_MOVIE_ID);
+
+            //A Uri is then created using movieID
             final Uri movieUri = MovieContract.MovieTable.CONTENT_URI.buildUpon().appendPath(Integer.toString(movieID)).build();
 
-
-            //TODO: Instead of using an ASyncTask here, considering adding an additional loader to
-            //the MovieDetails class, such as an ASyncTaskLoader
-            //Refer to the following for more information: http://stackoverflow.com/questions/15643907/multiple-loaders-in-same-activity
+            //An ASyncTask is launched so that additional data tied directly to the particular movie,
+            //which includes the runtime, trailer links, and review links, are obtained
             new AsyncTask<Void, Void, ContentValues>(){
 
                 @Override
                 protected ContentValues doInBackground(Void... params) {
                     ContentValues movieDetails = MovieFetcher.fetchDetails(movieID);
-                    Log.i(TAG, "Are movieDetails null?: " + (movieDetails == null));
+
                     return movieDetails;
                 }
 
@@ -115,6 +126,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
                 }
             }.execute();
 
+            //The Uri is then set to the Intent and MovieDetails is launched
             movieDetailsIntent.setData(movieUri);
             adapterContext.startActivity(movieDetailsIntent);
         }

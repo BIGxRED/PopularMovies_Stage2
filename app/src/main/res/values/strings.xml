@@ -36,5 +36,6 @@
     <!--Strings used for the movie trailer dialog-->
     <string name="alert_dialog_title">Please select a trailer:</string>
     <string name="alert_dialog_cancel_button_text">Cancel</string>
+    <string name="alert_dialog_chooser_title">Choose app to view trailer:</string>
 
 </resources>
