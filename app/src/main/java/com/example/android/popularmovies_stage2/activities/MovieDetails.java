@@ -435,20 +435,23 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
         //clicks on a movie poster, they are taken directly to that movie. If this loop is not
         //performed, then the user will always be taken to the movie at the beginning of the Cursor,
         //regardless of which movie they actually selected.
-        for(int k = 0; k < data.getCount(); k++){
-            int currentMovieID = data.getInt(INDEX_MOVIE_ID);
-            if (currentMovieID == mMovieID){
-                mViewPager.setCurrentItem(k);
-                break;
-            }
-            data.moveToNext();
+        if (data.moveToFirst() && data.getCount() >= 1){
+            do {
+                int currentMovieID = data.getInt(INDEX_MOVIE_ID);
+                if (currentMovieID == mMovieID){
+                    mViewPager.setCurrentItem(data.getPosition());
+                    break;
+                }
+            } while (data.moveToNext());
         }
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mPagerAdapter.swapCursor(null);
     }
+
 
     //This is a helper method which updated the contents of the DB when the user favorites or
     //un-favorites a movie
