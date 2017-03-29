@@ -53,7 +53,7 @@ public class MovieFetcher {
     private static final String PARAM_APPEND_T0_RESPONSE = "append_to_response";
 
     //Parameter values to be used when building the URL
-    private static final String API_KEY = "";
+    private static final String API_KEY = BuildConfig.THE_MOVIE_DB_API_TOKEN;
     private static final String LANGUAGE = "en-US";
     private static final String APPENDED_REQUESTS = "videos,reviews";
 

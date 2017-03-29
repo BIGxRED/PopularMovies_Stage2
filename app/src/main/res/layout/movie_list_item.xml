@@ -6,7 +6,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="240dp">
+    android:layout_height="@dimen/movie_poster_height">
 
     <!--Movie poster ImageView. As of now, this is the only piece of data shown within the
     RecyclerView.-->
@@ -14,7 +14,7 @@
         android:id="@+id/list_item_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="2dp"
+        android:layout_margin="@dimen/margin_extra_small"
         style="@style/MoviePoster"/>
 
 </LinearLayout>

@@ -180,10 +180,13 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
                     Intent firstTrailerIntent = new Intent(Intent.ACTION_VIEW, firstTrailerUri);
 
                     //We allow the user to choose which app they'd like to view the trailer in
-                    //by creating a chooser intent
+                    //by creating a chooser intent; however, we also ensure that the user has an
+                    //app to view the trailer
                     String chooserTitle = getString(R.string.alert_dialog_chooser_title);
                     Intent chooser = Intent.createChooser(firstTrailerIntent, chooserTitle);
-                    startActivity(chooser);
+                    if (chooser.resolveActivity(getActivity().getPackageManager()) != null){
+                        startActivity(chooser);
+                    }
                 }
             });
         }
@@ -210,7 +213,9 @@ public class MovieTrailersDialogFragment extends DialogFragment implements Loade
 
                     String chooserTitle = getString(R.string.alert_dialog_chooser_title);
                     Intent chooser = Intent.createChooser(firstTrailerIntent,chooserTitle);
-                    startActivity(chooser);
+                    if (chooser.resolveActivity(getActivity().getPackageManager()) != null){
+                        startActivity(chooser);
+                    }
                 }
             });
         }

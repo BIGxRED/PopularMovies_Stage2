@@ -10,16 +10,16 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:layout_weight="1"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium">
 
         <ImageView
             android:id="@+id/iv_first_trailer_thumbnail"
-            android:layout_width="160dp"
-            android:layout_height="80dp"
+            android:layout_width="@dimen/movie_trailer_thumbnail_width"
+            android:layout_height="@dimen/movie_trailer_thumbnail_height"
             android:background="@color/colorAccent"
             android:layout_weight="1"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/margin_medium"
             android:scaleType="centerCrop"/>
 
         <TextView
@@ -28,7 +28,7 @@
             android:layout_height="match_parent"
             android:text="N/A"
             android:gravity="center"
-            android:textSize="16sp"
+            android:textSize="@dimen/movie_trailer_title_text_size"
             android:layout_weight="2"/>
 
     </LinearLayout>
@@ -38,8 +38,8 @@
         style="@style/HorizontalDivider"
         android:layout_height="1dp"
         android:layout_width="match_parent"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"/>
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small"/>
 
     <LinearLayout
         android:id="@+id/ll_second_trailer"
@@ -49,11 +49,11 @@
 
         <ImageView
             android:id="@+id/iv_second_trailer_thumbnail"
-            android:layout_width="160dp"
-            android:layout_height="80dp"
+            android:layout_width="@dimen/movie_trailer_thumbnail_width"
+            android:layout_height="@dimen/movie_trailer_thumbnail_height"
             android:background="@color/colorAccent"
             android:layout_weight="1"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/margin_medium"
             android:scaleType="centerCrop"/>
 
         <TextView
@@ -62,7 +62,7 @@
             android:layout_height="match_parent"
             android:text="N/A"
             android:gravity="center"
-            android:textSize="16sp"
+            android:textSize="@dimen/movie_trailer_title_text_size"
             android:layout_weight="2"/>
 
     </LinearLayout>

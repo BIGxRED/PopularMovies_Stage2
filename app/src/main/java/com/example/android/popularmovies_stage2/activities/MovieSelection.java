@@ -6,6 +6,7 @@ package com.example.android.popularmovies_stage2.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -72,7 +73,6 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
     public static final int INDEX_SORTED_BY = 2;
     public static final int INDEX_FAVORITE = 3;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,8 +84,15 @@ public class MovieSelection extends AppCompatActivity implements LoaderCallbacks
         mErrorMessageTextView = (TextView) findViewById(R.id.tv_error_loading_message);
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movie_selection);
 
-        //The LayoutManager is set to being a GridLayoutManager, with a span count of 3
-        GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
+        //The LayoutManager is set to being a GridLayoutManager, with a span count of 3 in portrait
+        //mode and 4 if the user flips the device into landscape mode
+        GridLayoutManager layoutManager;
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            layoutManager = new GridLayoutManager(getApplicationContext(), 3);
+        }
+        else{
+            layoutManager = new GridLayoutManager(getApplicationContext(), 4);
+        }
         mRecyclerView.setLayoutManager(layoutManager);
 
         //This setting is used because all of the elements within the RecyclerView will be the same

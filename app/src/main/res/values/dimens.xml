@@ -2,4 +2,36 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!--Various sizes used for the layout margins-->
+    <dimen name="margin_extra_small">2dp</dimen>
+    <dimen name="margin_small">4dp</dimen>
+    <dimen name="margin_medium">8dp</dimen>
+    <dimen name="margin_large">16dp</dimen>
+    <dimen name="margin_extra_large">24dp</dimen>
+
+    <!--Various sizes used for padding-->
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+
+    <!--Dimensions for the movie title background view-->
+    <dimen name="movie_title_background_width">0dp</dimen>
+    <dimen name="movie_title_background_height">80dp</dimen>
+
+    <!--Dimensions for the movie poster-->
+    <dimen name="movie_poster_width">160dp</dimen>
+    <dimen name="movie_poster_height">240dp</dimen>
+
+    <!--Movie trailer play button dimensions-->
+    <dimen name="movie_trailer_play_button">48dp</dimen>
+
+    <!--Movie trailer dimensions-->
+    <dimen name="movie_trailer_thumbnail_width">160dp</dimen>
+    <dimen name="movie_trailer_thumbnail_height">80dp</dimen>
+    <dimen name="movie_trailer_title_text_size">16sp</dimen>
+
+    <!--Movie overview textsize-->
+    <dimen name="movie_overview_text_size">16sp</dimen>
+
 </resources>
