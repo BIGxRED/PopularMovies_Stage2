@@ -7,19 +7,19 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp">
+            android:padding="@dimen/padding_medium">
 
     <android.support.constraint.ConstraintLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent">
 
-        <!--Background view to add some polish to the movie tital-->
+        <!--Background view to add some polish to the movie title-->
         <View
             android:id="@+id/title_background"
-            android:layout_width="0dp"
-            android:layout_height="80dp"
+            android:layout_width="@dimen/movie_title_background_width"
+            android:layout_height="@dimen/movie_title_background_height"
             android:background="@color/colorPrimary"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="@dimen/margin_large"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/fl_movie_poster"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -34,12 +34,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:button="@drawable/statelist_favorite_button"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="@dimen/margin_medium"
             app:layout_constraintRight_toRightOf="@+id/title_background"
             app:layout_constraintTop_toTopOf="@+id/title_background"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/margin_medium"
             android:onClick="onFavoriteClicked"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="@dimen/margin_medium"/>
 
         <!--Movie title-->
         <TextView
@@ -57,25 +57,25 @@
         <!--Contains both the movie poster and the play button which overlays on top of it-->
         <FrameLayout
             android:id="@+id/fl_movie_poster"
-            android:layout_width="160dp"
-            android:layout_height="240dp"
+            android:layout_width="@dimen/movie_poster_width"
+            android:layout_height="@dimen/movie_poster_height"
             app:layout_constraintLeft_creator="1"
             app:layout_constraintBottom_toTopOf="@+id/separator"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title_background"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="@dimen/margin_large">
 
             <!--Movie poster-->
             <ImageView
                 android:id="@+id/iv_movie_poster"
-                android:layout_width="160dp"
-                android:layout_height="240dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 style="@style/MoviePoster"/>
 
             <ImageView
                 android:id="@+id/iv_play_button"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="@dimen/movie_trailer_play_button"
+                android:layout_height="@dimen/movie_trailer_play_button"
                 android:background="@drawable/play_button_48dp"
                 android:layout_gravity="center"
                 android:alpha="0.5"/>
@@ -90,11 +90,11 @@
             android:textStyle="bold"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/margin_extra_large"
             app:layout_constraintLeft_toRightOf="@+id/fl_movie_poster"
             app:layout_constraintBottom_toTopOf="@+id/tv_movie_release_date"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="@dimen/margin_medium"/>
 
         <!--Movie runtime-->
         <TextView
@@ -103,8 +103,8 @@
             style="@style/MovieStats"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginStart="@dimen/margin_medium"
             app:layout_constraintLeft_toRightOf="@+id/tv_movie_runtime_label"
             app:layout_constraintBottom_toBottomOf="@+id/tv_movie_runtime_label"/>
 
@@ -116,8 +116,8 @@
             android:textStyle="bold"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:layout_marginLeft="@dimen/margin_medium"
             app:layout_constraintBaseline_toBaselineOf="@+id/tv_movie_release_date"
             app:layout_constraintLeft_toRightOf="@+id/fl_movie_poster"/>
 
@@ -128,7 +128,7 @@
             style="@style/MovieStats"
             android:layout_height="40dp"
             android:layout_width="120dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/margin_medium"
             app:layout_constraintBottom_toBottomOf="@+id/fl_movie_poster"
             app:layout_constraintTop_toBottomOf="@+id/title_background"
             app:layout_constraintRight_toRightOf="parent"
@@ -143,11 +143,11 @@
             android:textStyle="bold"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/margin_medium"
             tools:layout_constraintTop_creator="1"
             app:layout_constraintLeft_toRightOf="@+id/fl_movie_poster"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_medium"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_release_date"/>
 
         <!--Vote average and vote counts-->
@@ -156,10 +156,10 @@
             style="@style/MovieStats"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="@dimen/margin_medium"
             android:text="N/A"
             app:layout_constraintLeft_toRightOf="@+id/tv_movie_vote_results_label"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/margin_medium"
             app:layout_constraintBottom_toBottomOf="@+id/tv_movie_vote_results_label"
             />
 
@@ -169,7 +169,7 @@
             style="@style/HorizontalDivider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/margin_medium"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/fl_movie_poster"/>
@@ -190,7 +190,7 @@
             android:id="@+id/tv_movie_overview"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="@dimen/movie_overview_text_size"
             android:text="N/A"
             app:layout_constraintTop_toBottomOf="@+id/tv_overview_heading"
             app:layout_constraintRight_toRightOf="@+id/tv_overview_heading"
@@ -203,7 +203,7 @@
             style="@style/HorizontalDivider"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/margin_medium"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_movie_overview"/>
@@ -238,7 +238,7 @@
                 android:text="@string/movie_details_header_review1"
                 style="@style/MovieStats"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/margin_medium"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_reviews_heading"
@@ -260,7 +260,7 @@
                 android:id="@+id/tv_review1_click_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/margin_small"
                 android:text="@string/movie_details_header_review_read_more"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -286,7 +286,7 @@
                 android:text="@string/movie_details_header_review2"
                 style="@style/MovieStats"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/margin_medium"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_review1_click_hint"
@@ -308,7 +308,7 @@
                 android:id="@+id/tv_review2_click_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/margin_small"
                 android:text="@string/movie_details_header_review_read_more"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"

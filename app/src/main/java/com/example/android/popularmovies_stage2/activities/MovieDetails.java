@@ -135,9 +135,11 @@ public class MovieDetails extends AppCompatActivity implements LoaderManager.Loa
 
         //We obtain a reference to the intent received from the MovieSelection class
         Intent receivedIntent = getIntent();
-
-        //...and then extra the Uri that was attached to the intent
-        mMovieUri = receivedIntent.getData();
+        if (receivedIntent != null){
+            //...and, assuming that the intent was not null, we obtain the Uri that was attached
+            //to the intent
+            mMovieUri = receivedIntent.getData();
+        }
 
         //If the Uri is empty, then throw an exception; not much that we can do in this activity
         //with an empty Uri
